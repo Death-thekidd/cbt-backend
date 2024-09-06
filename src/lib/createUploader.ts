@@ -1,7 +1,7 @@
 import multer from "multer";
 import path from "path";
 
-const createUploader = ({ asset, folder }) => {
+const createUploader = ({ asset, folder }: { asset: any; folder: any }) => {
 	// validate that the file passed is an image
 	// this could potentially be used to upload any file
 

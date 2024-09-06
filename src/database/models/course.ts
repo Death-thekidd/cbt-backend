@@ -4,7 +4,10 @@ import sequelizeConnection from "../connection";
 export interface CourseAttributes {
 	id?: Identifier;
 	name: string;
-	facultyId: Identifier;
+	code: string;
+	departmentId: Identifier;
+	levelId: Identifier;
+	semesterId: Identifier;
 	updatedAt?: Date;
 	createdAt?: Date;
 }
@@ -16,7 +19,10 @@ class Course extends Model<CourseAttributes> implements CourseAttributes {
 	 */
 	public id!: Identifier;
 	public name!: string;
-	public facultyId!: Identifier;
+	public departmentId!: Identifier;
+	public levelId!: Identifier;
+	public semesterId!: Identifier;
+	public code!: string;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
 
@@ -48,7 +54,10 @@ Course.init(
 			autoIncrement: false,
 		},
 		name: DataTypes.STRING,
-		facultyId: DataTypes.UUID,
+		departmentId: DataTypes.UUID,
+		levelId: DataTypes.UUID,
+		semesterId: DataTypes.UUID,
+		code: DataTypes.STRING,
 	},
 	{
 		sequelize: sequelizeConnection,

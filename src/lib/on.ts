@@ -13,7 +13,7 @@
 //
 // Much cleaner
 
-const on = (promise) => {
+const on = (promise: Promise<any>) => {
 	return promise.then((data) => [null, data]).catch((err) => [err]);
 };
 

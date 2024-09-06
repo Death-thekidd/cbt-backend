@@ -5,8 +5,8 @@ export interface ExamresultAttributes {
 	id?: Identifier;
 	examId: Identifier;
 	userId: Identifier;
-	questions: JSON;
-	answers: JSON;
+	questions: any[];
+	answers: any[];
 	score: number;
 	startTime: Date;
 	endTime: Date;
@@ -25,8 +25,8 @@ class Examresult
 	public id!: Identifier;
 	public examId!: Identifier;
 	public userId!: Identifier;
-	public questions!: JSON;
-	public answers!: JSON;
+	public questions!: any[];
+	public answers!: any[];
 	public score!: number;
 	public startTime!: Date;
 	public endTime!: Date;
