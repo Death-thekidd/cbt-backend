@@ -20,10 +20,10 @@ const createQuestion = async (data: any) => {
 	// As this will be consumed as a service, we might need to do validation directly here
 
 	try {
-		let course = await Course.findOne({
+		const course = await Course.findOne({
 			where: { id: data.courseId },
 		});
-		let courseCode = course.code.replace(/\s+/g, "");
+		const courseCode = course.code.replace(/\s+/g, "");
 		const questionNoPrefix = `QS-${courseCode}`;
 		const questionGroup = await Question.count({
 			where: {
@@ -31,7 +31,7 @@ const createQuestion = async (data: any) => {
 			},
 		});
 
-		let serialNo = await addZero(questionGroup + 1, 2);
+		const serialNo = await addZero(questionGroup + 1, 2);
 
 		console.log("result:", questionGroup);
 

@@ -99,8 +99,8 @@ const countCourses = async (req: Request, res: Response) => {
 const updateCourse = async (req: Request, res: Response) => {
 	const respondAndLog = createResponder(req, res),
 		activity = "UPDATE_COURSE";
-	let courseId = req.params.courseId;
-	let data = req.body;
+	const courseId = req.params.courseId;
+	const data = req.body;
 
 	try {
 		const course = await courseService.updateCourse({ courseId, data });
@@ -129,7 +129,7 @@ const updateCourse = async (req: Request, res: Response) => {
 const deleteCourses = async (req: Request, res: Response) => {
 	const respondAndLog = createResponder(req, res),
 		activity = "DELETE_COURSE";
-	let data = req.params.courseId;
+	const data = req.params.courseId;
 	console.log(data);
 
 	try {

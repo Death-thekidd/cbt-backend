@@ -96,8 +96,8 @@ const countDepartments = async (req: Request, res: Response) => {
 const updateDepartment = async (req: Request, res: Response) => {
 	const respondAndLog = createResponder(req, res),
 		activity = "UPDATE_DEPARTMENT";
-	let departmentId = req.params.departmentId;
-	let name = req.body.name;
+	const departmentId = req.params.departmentId;
+	const name = req.body.name;
 
 	try {
 		const department = await departmentService.updateDepartment({
@@ -129,7 +129,7 @@ const updateDepartment = async (req: Request, res: Response) => {
 const deleteDepartments = async (req: Request, res: Response) => {
 	const respondAndLog = createResponder(req, res),
 		activity = "DELETE_NOTE";
-	let data = req.params.departmentId;
+	const data = req.params.departmentId;
 	console.log(data);
 
 	try {

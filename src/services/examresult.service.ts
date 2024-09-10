@@ -119,7 +119,7 @@ const deleteExamresult = async (data: any) => {
 //Get Examresult By ID
 const getExamresultById = async (data: any) => {
 	try {
-		let result = await Examresult.findOne({
+		const result = await Examresult.findOne({
 			attributes: [
 				"id",
 				[col("exams.courses.levels.name"), "level"],
