@@ -25,7 +25,18 @@ class Examquestion
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
 
-	static associate(models: any) {}
+	static associate(models: any) {
+		Examquestion.belongsTo(models?.Exam, {
+			foreignKey: "examId",
+			targetKey: "id",
+			as: "exams",
+		});
+		Examquestion.belongsTo(models?.Question, {
+			foreignKey: "questionId",
+			targetKey: "id",
+			as: "questions",
+		});
+	}
 }
 Examquestion.init(
 	{

@@ -81,7 +81,7 @@ const updateSession = async ({
 /**
  * Delete Sessions
  */
-exports.deleteSession = async (data: any) => {
+const deleteSession = async (data: any) => {
 	try {
 		return await Session.destroy({
 			where: {
@@ -93,4 +93,4 @@ exports.deleteSession = async (data: any) => {
 	}
 };
 
-export { createSession, getSessions, countSessions, updateSession };
+export default { createSession, getSessions, countSessions, updateSession, deleteSession };

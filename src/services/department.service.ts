@@ -68,7 +68,7 @@ const updateDepartment = async ({
 	try {
 		return await Department.update(
 			{
-				name: data.name,
+				name: data,
 			},
 			{
 				where: { id: departmentId },
@@ -94,7 +94,7 @@ const deleteDepartment = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createDepartment,
 	getDepartments,
 	countDepartments,

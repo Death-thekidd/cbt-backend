@@ -91,7 +91,7 @@ const deleteQuestiontype = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createQuestiontype,
 	getQuestiontypes,
 	countQuestiontypes,

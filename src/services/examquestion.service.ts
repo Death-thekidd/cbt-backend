@@ -5,29 +5,24 @@ import { Identifier, Op, col } from "sequelize";
  * Create Examquestion
  * User: Admin
  */
-
 const createExamquestion = async (data: any) => {
-	// As this will be consumed as a service, we might need to do validation directly here
 	try {
 		return await Examquestion.create({ ...data });
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		throw error;
 	}
 };
 
 /**
- *
  * Bulk Create
  */
 const bulkCreateExamQuestions = async (data: any) => {
-	// As this will be consumed as a service, we might need to do validation directly here
-
 	try {
 		console.log(data);
 		return await Examquestion.bulkCreate(data, { returning: true });
 	} catch (error) {
-		console.log(error);
+		console.error(error);
 		throw error;
 	}
 };
@@ -36,7 +31,6 @@ const bulkCreateExamQuestions = async (data: any) => {
  * Get all Examquestions
  * User: Admin
  */
-
 const getExamquestions = async () => {
 	try {
 		return await Examquestion.findAll({
@@ -63,73 +57,64 @@ const countExamquestions = async () => {
 };
 
 /**
- * Create a new Examquestion
- *
-
-
-/***
- * Update  Examquestion
- * 
-*/
+ * Update Examquestion
+ */
 const updateExamquestion = async ({
-	examresultId,
+	examquestionId,
 	data,
 }: {
-	examresultId: Identifier;
+	examquestionId: Identifier;
 	data: any;
 }) => {
-	///const userId = "2e0fe763-1ddf-4170-9ea7-857ec70ae1d6"
-
 	try {
 		return await Examquestion.update(data, {
-			where: { id: examresultId },
-		}).catch(function (error) {
-			throw error;
+			where: { id: examquestionId },
 		});
-	} catch (error) {}
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
 };
 
 /**
- * Delete Examquestions
+ * Delete Examquestion
  */
-const deleteExamquestion = async (data: any) => {
+const deleteExamquestion = async (examquestionId: Identifier) => {
 	try {
 		return await Examquestion.destroy({
 			where: {
-				id: data, //?  data.materialId: matID
+				id: examquestionId,
 			},
 		});
-	} catch (err) {
-		throw err;
+	} catch (error) {
+		throw error;
 	}
 };
 
-//Get Question By ID
-const getQuestionById = async (data: any) => {
+// Get Question By ID
+const getQuestionById = async (questionId: Identifier) => {
 	try {
-		console.log(data);
 		return await Question.findOne({
-			where: { id: { [Op.eq]: data } },
+			where: { id: { [Op.eq]: questionId } },
 		});
 	} catch (error) {
 		throw error;
 	}
 };
 
-const checkQuestionExist = async () => {
+// Check if Question Exists
+const checkQuestionExist = async (questionId: Identifier) => {
 	try {
-		const exist = await Examquestion.count({});
-		if (exist > 0) {
-			return true;
-		} else {
-			return false;
-		}
+		const count = await Examquestion.count({
+			where: { questionId }, // Assuming there's a field named questionId in Examquestion
+		});
+		return count > 0; // Returns true if exists, false otherwise
 	} catch (error) {
 		throw error;
 	}
 };
 
-export {
+export default {
 	createExamquestion,
 	getExamquestions,
 	countExamquestions,

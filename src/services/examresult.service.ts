@@ -199,7 +199,7 @@ const getExamresultById = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	getExamresults,
 	createExamresult,
 	countExamresults,

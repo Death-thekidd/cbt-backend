@@ -167,7 +167,7 @@ const deleteUser = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	getAllUsers,
 	getUser,
 	getUserByEmail,

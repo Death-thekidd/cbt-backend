@@ -182,7 +182,7 @@ const getQuestionById = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createQuestion,
 	getQuestions,
 	countQuestions,

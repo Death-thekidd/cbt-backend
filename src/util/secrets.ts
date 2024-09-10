@@ -31,6 +31,7 @@ export const SENDER_EMAIL = process.env["SENDER_EMAIL"];
 export const SENDER_PASS = process.env["SENDER_PASS"];
 
 export const URL_ORIGIN = process.env["URL_ORIGIN"];
+export const PORT = process.env["PORT"];
 
 if (!SESSION_SECRET) {
 	logger.error("No client secret. Set SESSION_SECRET environment variable.");

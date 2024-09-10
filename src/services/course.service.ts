@@ -150,7 +150,7 @@ const deleteCourse = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createCourse,
 	getCourses,
 	getCourseById,

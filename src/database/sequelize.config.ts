@@ -1,23 +1,15 @@
-{
-  "development": {
-    "username": "root",
-    "password": null,
-    "database": "database_development",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
-  "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
-  "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  }
-}
+// src/database/sequelize.config.js
+import {
+	MYSQL_DB_NAME,
+	MYSQL_DB_HOST,
+	MYSQL_DB_PASSWORD,
+	MYSQL_DB_USER,
+} from "../util/secrets";
+
+module.exports = {
+	username: MYSQL_DB_USER,
+	password: MYSQL_DB_PASSWORD,
+	database: MYSQL_DB_NAME,
+	host: MYSQL_DB_HOST,
+	dialect: "mysql",
+};

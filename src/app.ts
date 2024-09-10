@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 
 // Routes
+import indexRouter from "../src/routers/home.router";
 import routes from "./routers/index.router";
 
 import connection from "./database/connection";
@@ -30,7 +31,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 
-app.use(routes);
+app.use("/", indexRouter);
+app.use("/api", routes);
 
 /**
  * Primary app routes.

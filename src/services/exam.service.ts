@@ -219,7 +219,7 @@ const deleteExam = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createExam,
 	getExams,
 	getExamById,

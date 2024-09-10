@@ -92,7 +92,7 @@ const deleteSemester = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createSemester,
 	getSemesters,
 	countSemesters,

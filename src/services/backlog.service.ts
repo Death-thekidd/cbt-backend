@@ -67,4 +67,9 @@ const getBacklogByUserId = async (id: Identifier) => {
 	}
 };
 
-export { getbacklogs, createBacklog, getBacklogDetailById, getBacklogByUserId };
+export default {
+	getbacklogs,
+	createBacklog,
+	getBacklogDetailById,
+	getBacklogByUserId,
+};

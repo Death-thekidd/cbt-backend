@@ -91,7 +91,7 @@ const deleteExamtype = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createExamtype,
 	getExamtypes,
 	countExamtypes,

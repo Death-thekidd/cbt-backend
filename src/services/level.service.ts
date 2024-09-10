@@ -92,4 +92,10 @@ const deleteLevel = async (data: any) => {
 	}
 };
 
-export { createLevel, getLevels, countLevels, updateLevel, deleteLevel };
+export default {
+	createLevel,
+	getLevels,
+	countLevels,
+	updateLevel,
+	deleteLevel,
+};

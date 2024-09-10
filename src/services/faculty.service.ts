@@ -92,7 +92,7 @@ const deleteFaculty = async (data: any) => {
 	}
 };
 
-export {
+export default {
 	createFaculty,
 	getFaculties,
 	countFaculties,

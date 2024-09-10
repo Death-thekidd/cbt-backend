@@ -1,11 +1,12 @@
 import errorHandler from "errorhandler";
 import app from "./app";
 import http from "http";
+import { PORT } from "./util/secrets";
 
 /**
  * Get port from environment and store in Express.
  */
-const port = normalizePort(process.env.PORT || "3000");
+const port = normalizePort(PORT || "3000");
 app.set("port", port);
 
 /**
