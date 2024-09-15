@@ -6,7 +6,7 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 
 // Routes
-import indexRouter from "../src/routers/home.router";
+import indexRouter from "./routers/home.router";
 import routes from "./routers/index.router";
 
 import connection from "./database/connection";

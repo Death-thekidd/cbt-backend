@@ -23,7 +23,7 @@ const constraints = [
 	{
 		table: "Courses",
 		field: "semesterId",
-		name: "course_department",
+		name: "course_semester",
 		references: { table: "Semesters", field: "id" },
 	},
 	{
@@ -79,12 +79,6 @@ const constraints = [
 		field: "sessionId",
 		name: "question_session",
 		references: { table: "Sessions", field: "id" },
-	},
-	{
-		table: "RolePrivileges",
-		field: "roleId",
-		name: "FK_RolePrivilege_roleId",
-		references: { table: "Roles", field: "id" },
 	},
 ];
 
