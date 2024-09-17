@@ -1,5 +1,6 @@
 import { Model, DataTypes, Identifier } from "sequelize";
 import sequelizeConnection from "../connection";
+import Faculty from "./faculty";
 
 export interface DepartmentAttributes {
 	id?: Identifier;

@@ -17,6 +17,8 @@ class Faculty extends Model<FacultyAttributes> implements FacultyAttributes {
 	public name!: string;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
+
+	static associate(models: any) {}
 }
 Faculty.init(
 	{

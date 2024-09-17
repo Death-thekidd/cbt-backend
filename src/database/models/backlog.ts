@@ -1,5 +1,6 @@
 import { Model, DataTypes, Identifier } from "sequelize";
 import sequelizeConnection from "../connection";
+import { BaseModel } from "./BaseModel";
 
 export interface BacklogAttributes {
 	id?: Identifier;
@@ -25,6 +26,8 @@ class Backlog extends Model<BacklogAttributes> implements BacklogAttributes {
 	public errorMessage!: JSON;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
+
+	static associate(models: any) {}
 }
 Backlog.init(
 	{

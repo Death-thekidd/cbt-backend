@@ -35,6 +35,8 @@ class User extends Model<UserAttributes> implements UserAttributes {
 	public picUrl!: string;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
+
+	static associate(models: any) {}
 }
 User.init(
 	{
