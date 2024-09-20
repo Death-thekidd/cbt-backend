@@ -25,9 +25,11 @@ const createQuestion = async (data: any) => {
 		});
 		const courseCode = course.code.replace(/\s+/g, "");
 		const questionNoPrefix = `QS-${courseCode}`;
+
+		// Use LOWER to achieve case-insensitive matching
 		const questionGroup = await Question.count({
 			where: {
-				name: { [Op.iLike]: `${questionNoPrefix}-%` },
+				name: { [Op.like]: `${questionNoPrefix}-%` }, // Change to LIKE
 			},
 		});
 
@@ -35,7 +37,7 @@ const createQuestion = async (data: any) => {
 
 		console.log("result:", questionGroup);
 
-		const questionName = await `${questionNoPrefix}-${serialNo}`;
+		const questionName = `${questionNoPrefix}-${serialNo}`; // Removed await
 
 		return await Question.create({
 			...data,

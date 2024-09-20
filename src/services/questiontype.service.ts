@@ -25,7 +25,7 @@ const createQuestiontype = async (data: any) => {
 const getQuestiontypes = async () => {
 	try {
 		return await Questiontype.findAll({
-			attributes: ["id", "name"],
+			attributes: ["id", "name", "description"],
 			order: [["name", "DESC"]],
 		});
 	} catch (error) {
