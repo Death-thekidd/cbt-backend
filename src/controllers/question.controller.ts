@@ -118,12 +118,11 @@ const questionController = {
 		const respondAndLog = createResponder(req, res);
 		const activity = "UPDATE_QUESTION";
 		const questionId = req.params.questionId;
-		const { name } = req.body;
 
 		try {
 			const question = await questionService.updateQuestion({
 				questionId,
-				data: { name },
+				data: req.body,
 			});
 			respondAndLog({
 				activity,

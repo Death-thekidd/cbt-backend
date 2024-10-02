@@ -21,7 +21,7 @@ module.exports = {
 				type: Sequelize.UUID,
 			},
 			examtypeId: {
-				type: Sequelize.INTEGER,
+				type: Sequelize.UUID,
 			},
 			startDate: {
 				type: Sequelize.DATE,

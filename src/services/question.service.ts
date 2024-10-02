@@ -147,7 +147,11 @@ const updateQuestion = async ({
 	try {
 		return await Question.update(
 			{
-				name: data.name,
+				questionText: data?.questionText,
+				questiontypeId: data?.questiontypeId,
+				options: data?.options,
+				courseId: data?.courseId,
+				answer: data?.answer,
 			},
 			{
 				where: { id: questionId },

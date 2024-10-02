@@ -163,25 +163,24 @@ const getExamresultById = async (data: any) => {
 			where: { id: { [Op.eq]: data } },
 		});
 
+		if (!result) {
+			throw new Error("Exam result not found");
+		}
+
 		let correct = 0;
 		let wrong = 0;
 		let unanswered = 0;
-		await result.questions.forEach((element, index) => {
+		const questions: any[] = JSON.parse(result.questions as unknown as string);
+		const answers: any[] = JSON.parse(result.answers as unknown as string);
+
+		questions.forEach((element, index) => {
 			for (let i = 0; i < element.answer.length; i++) {
-				if (result.answers[index].answer[i] == 0) unanswered++;
-				else if (element.answer[i] == result.answers[index].answer[i]) correct++;
-				else if (element.answer[i] != result.answers[index].answer[i]) wrong++;
+				if (answers[index].answer[i] == 0) unanswered++;
+				else if (element.answer[i] == answers[index].answer[i]) correct++;
+				else if (element.answer[i] != answers[index].answer[i]) wrong++;
 			}
-			/* console.log(
-                element.id, 
-                element.questionText, 
-                element.answer,
-                result.answers[index].answer,
-                
-                "=> index:", 
-            
-            index)*/
 		});
+
 		const grading = {
 			total: correct + wrong + unanswered,
 			correct: correct,
@@ -189,11 +188,11 @@ const getExamresultById = async (data: any) => {
 			unanswered: unanswered,
 			score: correct - wrong / 2,
 		};
-		//console.log(grading)
-		// result.dataValues.grade = grading;
-		//console.log(correct, wrong, unanswerd)
-		//console.log("working")
-		return { ...result, dataValues: { ...result.dataValues, grade: grading } };
+
+		return {
+			...result.get(), // Get a plain object
+			grade: grading,
+		};
 	} catch (error) {
 		throw error;
 	}
