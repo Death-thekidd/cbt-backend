@@ -2,6 +2,7 @@ import { Model, DataTypes, Identifier } from "sequelize";
 import sequelizeConnection from "../connection";
 import Course from "./course";
 import Session from "./session";
+import { QuestionAttributes } from "./question";
 
 export interface ExamAttributes {
 	id?: Identifier;
@@ -33,6 +34,9 @@ class Exam extends Model<ExamAttributes> implements ExamAttributes {
 	public instruction!: string;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
+	addQuestions: (questions: QuestionAttributes[]) => Promise<any>;
+	removeQuestion: () => Promise<any>;
+	Questions: QuestionAttributes[];
 
 	static associate(models: any) {
 		Exam.belongsTo(models.Course, {
@@ -44,6 +48,12 @@ class Exam extends Model<ExamAttributes> implements ExamAttributes {
 			foreignKey: "sessionId",
 			targetKey: "id",
 			as: "sessions",
+		});
+		Exam.belongsToMany(models?.Question, {
+			through: "Examquestions",
+		});
+		Exam.belongsToMany(models?.User, {
+			through: "Examstudents",
 		});
 	}
 }

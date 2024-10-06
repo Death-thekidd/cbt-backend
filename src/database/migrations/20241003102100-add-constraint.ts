@@ -51,6 +51,18 @@ const constraints = [
 		references: { table: "Questions", field: "id" },
 	},
 	{
+		table: "Examstudents",
+		field: "examId",
+		name: "exams_exam",
+		references: { table: "Exams", field: "id" },
+	},
+	{
+		table: "Examstudents",
+		field: "studentId",
+		name: "exams_student",
+		references: { table: "Users", field: "id" },
+	},
+	{
 		table: "Examresults",
 		field: "examId",
 		name: "examr_exam",

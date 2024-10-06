@@ -1,4 +1,4 @@
-import { Examquestion, Question, Faculty } from "../database/models";
+import { Examquestion, Question, Faculty, Exam } from "../database/models";
 import { Identifier, Op, col } from "sequelize";
 
 /**
@@ -34,11 +34,15 @@ const bulkCreateExamQuestions = async (data: any) => {
 const getExamquestions = async () => {
 	try {
 		return await Examquestion.findAll({
-			attributes: ["id", "name", [col("faculties.name"), "faculty"]],
-			include: [
-				{ model: Faculty, required: true, as: "faculties", attributes: [] },
+			attributes: [
+				[col("questions.name"), "qname"],
+				[col("exams.name"), "ename"],
 			],
-			order: [["name", "DESC"]],
+			include: [
+				{ model: Question, required: true, as: "questions", attributes: [] },
+				{ model: Exam, required: true, as: "exams", attributes: [] },
+			],
+			order: [["qname", "ASC"]],
 		});
 	} catch (error) {
 		throw error;
@@ -68,7 +72,9 @@ const updateExamquestion = async ({
 }) => {
 	try {
 		return await Examquestion.update(data, {
-			where: { id: examquestionId },
+			where: {
+				// id: examquestionId
+			},
 		});
 	} catch (error) {
 		console.error(error);
@@ -83,7 +89,7 @@ const deleteExamquestion = async (examquestionId: Identifier) => {
 	try {
 		return await Examquestion.destroy({
 			where: {
-				id: examquestionId,
+				// id: examquestionId,
 			},
 		});
 	} catch (error) {

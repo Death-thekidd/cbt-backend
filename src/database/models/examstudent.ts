@@ -1,43 +1,45 @@
 import { Model, DataTypes, Identifier } from "sequelize";
 import sequelizeConnection from "../connection";
 
-export interface ExamquestionAttributes {
+export interface ExamstudentAttributes {
+	id?: Identifier;
 	examId: Identifier;
-	questionId: Identifier;
+	studentId: Identifier;
 	updatedAt?: Date;
 	createdAt?: Date;
 }
-class Examquestion
-	extends Model<ExamquestionAttributes>
-	implements ExamquestionAttributes
+class Examstudent
+	extends Model<ExamstudentAttributes>
+	implements ExamstudentAttributes
 {
 	/**
 	 * Helper method for defining associations.
 	 * This method is not a part of Sequelize lifecycle.
 	 * The `models/index` file will call this method automatically.
 	 */
+	public id!: Identifier;
 	public examId!: Identifier;
-	public questionId!: Identifier;
+	public studentId!: Identifier;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
 
 	static associate(models: any) {
-		Examquestion.belongsTo(models?.Exam, {
+		Examstudent.belongsTo(models?.Exam, {
 			foreignKey: "examId",
 			targetKey: "id",
 			as: "exams",
 		});
-		Examquestion.belongsTo(models?.Question, {
-			foreignKey: "questionId",
+		Examstudent.belongsTo(models?.User, {
+			foreignKey: "studentId",
 			targetKey: "id",
 			as: "questions",
 		});
 	}
 }
-Examquestion.init(
+Examstudent.init(
 	{
 		examId: DataTypes.UUID,
-		questionId: DataTypes.UUID,
+		studentId: DataTypes.UUID,
 	},
 	{
 		sequelize: sequelizeConnection,
@@ -45,4 +47,4 @@ Examquestion.init(
 	}
 );
 
-export default Examquestion;
+export default Examstudent;

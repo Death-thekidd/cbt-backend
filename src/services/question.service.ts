@@ -108,7 +108,7 @@ const getQuestions = async () => {
 				// { model: Level, required: false, as: "levels", attributes:[]},
 				//{ model: Semester, required: false, as: "semesters", attributes:[]}
 			],
-			order: [["name", "DESC"]],
+			order: [["name", "ASC"]],
 		});
 	} catch (error) {
 		throw error;
