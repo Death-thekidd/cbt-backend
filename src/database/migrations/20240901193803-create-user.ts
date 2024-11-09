@@ -19,7 +19,12 @@ module.exports = {
 			},
 			email: {
 				type: Sequelize.STRING,
+				allowNull: true,
 			},
+			// matricNo: {
+			// 	type: Sequelize.STRING,
+			// 	allowNull: true,
+			// },
 			password: {
 				allowNull: false,
 				type: Sequelize.STRING,

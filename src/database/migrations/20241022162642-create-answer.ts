@@ -3,32 +3,38 @@ import { QueryInterface, DataTypes } from "sequelize";
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
 	async up(queryInterface: QueryInterface, Sequelize: typeof DataTypes) {
-		await queryInterface.createTable("Questions", {
+		await queryInterface.createTable("Answers", {
 			id: {
 				allowNull: false,
 				primaryKey: true,
 				type: Sequelize.UUID,
 				defaultValue: Sequelize.UUIDV4,
 			},
-			name: {
-				type: Sequelize.STRING,
+			studentTrueOrFalse: {
+				type: Sequelize.BOOLEAN,
+				allowNull: true,
 			},
-			text: {
-				type: Sequelize.TEXT,
-				allowNull: false,
-			},
-			topic: {
-				type: Sequelize.TEXT,
+			isCorrect: {
+				type: Sequelize.BOOLEAN,
+				allowNull: true,
 			},
 			score: {
 				type: Sequelize.FLOAT,
 				allowNull: true,
 			},
-			type: {
-				type: Sequelize.ENUM("MCQ", "Medical"),
+			studentId: {
+				type: Sequelize.UUID,
 				allowNull: false,
 			},
-			courseId: {
+			examId: {
+				type: Sequelize.UUID,
+				allowNull: false,
+			},
+			questionId: {
+				type: Sequelize.UUID,
+				allowNull: false,
+			},
+			optionId: {
 				type: Sequelize.UUID,
 				allowNull: false,
 			},
@@ -43,6 +49,6 @@ module.exports = {
 		});
 	},
 	async down(queryInterface: QueryInterface, Sequelize: typeof DataTypes) {
-		await queryInterface.dropTable("Questions");
+		await queryInterface.dropTable("Answers");
 	},
 };

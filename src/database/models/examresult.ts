@@ -1,17 +1,10 @@
 import { Model, DataTypes, Identifier } from "sequelize";
 import sequelizeConnection from "../connection";
-import Exam from "./exam";
-import User from "./user";
 
 export interface ExamresultAttributes {
-	id?: Identifier;
 	examId: Identifier;
-	userId: Identifier;
-	questions: any[];
-	answers: any[];
-	score: number;
-	startTime: Date;
-	endTime: Date;
+	resultId: Identifier;
+	submitted: boolean;
 	updatedAt?: Date;
 	createdAt?: Date;
 }
@@ -24,46 +17,30 @@ class Examresult
 	 * This method is not a part of Sequelize lifecycle.
 	 * The `models/index` file will call this method automatically.
 	 */
-	public id!: Identifier;
 	public examId!: Identifier;
-	public userId!: Identifier;
-	public questions!: any[];
-	public answers!: any[];
-	public score!: number;
-	public startTime!: Date;
-	public endTime!: Date;
+	public resultId!: Identifier;
+	public submitted!: boolean;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
 
 	static associate(models: any) {
-		Examresult.belongsTo(models.Exam, {
+		Examresult.belongsTo(models?.Exam, {
 			foreignKey: "examId",
 			targetKey: "id",
 			as: "exams",
 		});
-		Examresult.belongsTo(models.User, {
-			foreignKey: "userId",
+		Examresult.belongsTo(models?.User, {
+			foreignKey: "resultId",
 			targetKey: "id",
-			as: "users",
+			as: "results",
 		});
 	}
 }
 Examresult.init(
 	{
-		id: {
-			type: DataTypes.UUID,
-			primaryKey: true,
-			defaultValue: DataTypes.UUIDV4,
-			allowNull: false,
-			autoIncrement: false,
-		},
 		examId: DataTypes.UUID,
-		userId: DataTypes.UUID,
-		questions: DataTypes.JSON,
-		answers: DataTypes.JSON,
-		score: DataTypes.INTEGER,
-		startTime: DataTypes.DATE,
-		endTime: DataTypes.DATE,
+		resultId: DataTypes.UUID,
+		submitted: DataTypes.BOOLEAN,
 	},
 	{
 		sequelize: sequelizeConnection,

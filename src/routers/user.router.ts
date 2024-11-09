@@ -7,7 +7,6 @@ import {
 	newPassword,
 	updateUserById,
 	deleteUsers,
-	getUserExamsById,
 } from "../controllers/user.controller";
 import validateToken from "../middlewares/validateToken";
 import loginUserValidation from "../validations/user/loginUser.validation";
@@ -17,7 +16,6 @@ const router = Router();
 
 router.get("/", getUsers);
 router.get("/:userId", getUserById);
-router.get("/exams/:userId", getUserExamsById);
 
 router.patch("/:userId", updateUserById);
 

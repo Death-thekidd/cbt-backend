@@ -267,35 +267,6 @@ const userController = {
 			});
 		}
 	},
-
-	/**
-	 * Get User Exams By ID
-	 */
-	getUserExamsById: async (req: Request, res: Response) => {
-		const respondAndLog = createResponder(req, res);
-		const activity = "FETCH_USER_EXAMS";
-		const userId = req.params.userId;
-
-		try {
-			const exams = await userService.getUserExamsById(userId);
-			return respondAndLog({
-				activity,
-				status: 200,
-				code: "USER_EXAMS_FETCHED",
-				data: exams,
-				message: "User exams fetched successfully",
-			});
-		} catch (error) {
-			console.error(error.message);
-			return respondAndLog({
-				activity,
-				status: 500,
-				code: "INTERNAL_SERVER_ERROR",
-				errorMessage: error.message,
-				message: "Something went wrong, contact support.",
-			});
-		}
-	},
 };
 
 export = userController;

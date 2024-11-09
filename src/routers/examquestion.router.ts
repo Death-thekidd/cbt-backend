@@ -1,23 +1,27 @@
 import { Router } from "express";
 import {
-	createExamquestion,
-	getExamquestions,
-	updateExamquestion,
-	deleteExamquestions,
+	addQuestion,
+	removeQuestion,
+	getQuestionsForExam,
+	getAddedQuestions,
 	countExamquestions,
-	bulkCreateExamQuestions,
 } from "../controllers/examquestion.controller";
 
 const router = Router();
 
-router.post("/create", createExamquestion);
-router.post("/bulkCreate", bulkCreateExamQuestions);
+// Route to add a question to an exam
+router.post("/:examId/questions", addQuestion);
 
-router.get("/", getExamquestions);
+// Route to get all questions for an exam
+router.get("/:examId/questions", getQuestionsForExam);
+
+// Route to get only added questions for an exam
+router.get("/:examId/added-questions", getAddedQuestions);
+
+// Route to count all exam questions
 router.get("/count", countExamquestions);
 
-router.patch("/:examquestionId", updateExamquestion);
-
-router.delete("/:examquestionId", deleteExamquestions);
+// Route to remove a question from an exam
+router.delete("/:examId/questions/:questionId", removeQuestion);
 
 export = router;

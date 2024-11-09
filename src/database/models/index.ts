@@ -3,15 +3,21 @@ import Backlog from "./backlog";
 import Course from "./course";
 import Department from "./department";
 import Exam from "./exam";
-import Examresult from "./examresult";
-import Examtype from "./examtype";
+import Result from "./result";
 import Examquestion from "./examquestion";
 import Faculty from "./faculty";
 import Level from "./level";
 import Semester from "./semester";
 import Session from "./session";
 import Question from "./question";
-import Questiontype from "./questiontype";
+import Answer from "./answer";
+import Option from "./option";
+import Examstudent from "./examstudent";
+import Questionoption from "./questionoption";
+import Questionanswer from "./questionanswer";
+import Optionanswer from "./optionanswer";
+import Examresult from "./examresult";
+import Studentresult from "./studentresult";
 
 // Define a type for the models
 type Models = {
@@ -20,15 +26,21 @@ type Models = {
 	Course: typeof Course;
 	Department: typeof Department;
 	Exam: typeof Exam;
-	Examresult: typeof Examresult;
-	Examtype: typeof Examtype;
+	Result: typeof Result;
 	Examquestion: typeof Examquestion;
+	Examstudent: typeof Examstudent;
 	Faculty: typeof Faculty;
 	Level: typeof Level;
 	Semester: typeof Semester;
 	Session: typeof Session;
 	Question: typeof Question;
-	Questiontype: typeof Questiontype;
+	Answer: typeof Answer;
+	Option: typeof Option;
+	Questionoption: typeof Questionoption;
+	Questionanswer: typeof Questionanswer;
+	Optionanswer: typeof Optionanswer;
+	Examresult: typeof Examresult;
+	Studentresult: typeof Studentresult;
 };
 
 // Create the models object
@@ -38,15 +50,21 @@ const models: Models = {
 	Course,
 	Department,
 	Exam,
-	Examresult,
-	Examtype,
+	Result,
 	Examquestion,
+	Examstudent,
 	Faculty,
 	Level,
 	Semester,
 	Session,
 	Question,
-	Questiontype,
+	Answer,
+	Option,
+	Questionoption,
+	Questionanswer,
+	Optionanswer,
+	Examresult,
+	Studentresult,
 };
 
 // Loop through each model and call associate
@@ -63,13 +81,19 @@ export {
 	Course,
 	Department,
 	Exam,
-	Examresult,
-	Examtype,
+	Result,
 	Examquestion,
+	Examstudent,
 	Faculty,
 	Level,
 	Semester,
 	Session,
 	Question,
-	Questiontype,
+	Answer,
+	Option,
+	Questionoption,
+	Questionanswer,
+	Optionanswer,
+	Examresult,
+	Studentresult,
 };

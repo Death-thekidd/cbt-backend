@@ -1,17 +1,17 @@
-import { Model, DataTypes, Identifier } from "sequelize";
+import { Model, DataTypes, Identifier, EnumDataType } from "sequelize";
 import sequelizeConnection from "../connection";
 import Course from "./course";
+import Option, { OptionAttributes } from "./option";
 
 export interface QuestionAttributes {
 	id?: Identifier;
 	name: string;
-	sessionId: Identifier;
-	courseId: Identifier;
-	questiontypeId: Identifier;
-	questionText: string;
-	options: JSON;
-	answer: JSON;
+	text: string;
+	topic: string;
 	score: number;
+	type: string;
+	courseId: Identifier;
+
 	updatedAt?: Date;
 	createdAt?: Date;
 }
@@ -23,31 +23,37 @@ class Question extends Model<QuestionAttributes> implements QuestionAttributes {
 	 */
 	public id!: Identifier;
 	public name!: string;
-	public sessionId!: Identifier;
-	public courseId!: Identifier;
-	public questiontypeId!: Identifier;
-	public questionText!: string;
-	public options!: JSON;
-	public answer!: JSON;
+	public text!: string;
+	public topic!: string;
 	public score!: number;
+	public type!: string;
+	public courseId!: Identifier;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
+	Options: Option[];
+	addOptions: (options: Option[]) => Promise<any>;
+	removeOption: () => Promise<any>;
 
 	static associate(models: any) {
-		Question.belongsTo(models.Questiontype, {
-			foreignKey: "questiontypeId",
-			targetKey: "id",
-			as: "questiontypes",
-		});
 		Question.belongsTo(models.Course, {
 			foreignKey: "courseId",
 			targetKey: "id",
 			as: "courses",
 		});
-		Question.belongsTo(models.Session, {
-			foreignKey: "sessionId",
-			targetKey: "id",
-			as: "sessions",
+		Question.belongsToMany(models?.Exam, {
+			through: "Examquestions",
+			foreignKey: "questionId",
+			as: "exams",
+		});
+		Question.belongsToMany(models?.Option, {
+			through: "Questionoptions",
+			foreignKey: "questionId",
+			as: "options",
+		});
+		Question.belongsToMany(models?.Answer, {
+			through: "Questionanswers",
+			foreignKey: "questionId",
+			as: "answers",
 		});
 	}
 }
@@ -61,13 +67,11 @@ Question.init(
 			autoIncrement: false,
 		},
 		name: DataTypes.STRING,
+		type: DataTypes.ENUM("MCQ", "Medical"),
+		text: DataTypes.TEXT,
+		topic: DataTypes.TEXT,
+		score: DataTypes.FLOAT,
 		courseId: DataTypes.UUIDV4,
-		sessionId: DataTypes.UUIDV4,
-		questiontypeId: DataTypes.UUID,
-		questionText: DataTypes.TEXT,
-		options: DataTypes.JSON,
-		answer: DataTypes.JSON,
-		score: DataTypes.INTEGER,
 	},
 	{
 		sequelize: sequelizeConnection,

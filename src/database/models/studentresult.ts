@@ -1,51 +1,48 @@
 import { Model, DataTypes, Identifier } from "sequelize";
 import sequelizeConnection from "../connection";
 
-export interface ExamstudentAttributes {
-	examId: Identifier;
+export interface StudentresultAttributes {
 	studentId: Identifier;
-	submitted: boolean;
+	resultId: Identifier;
 	updatedAt?: Date;
 	createdAt?: Date;
 }
-class Examstudent
-	extends Model<ExamstudentAttributes>
-	implements ExamstudentAttributes
+class Studentresult
+	extends Model<StudentresultAttributes>
+	implements StudentresultAttributes
 {
 	/**
 	 * Helper method for defining associations.
 	 * This method is not a part of Sequelize lifecycle.
 	 * The `models/index` file will call this method automatically.
 	 */
-	public examId!: Identifier;
 	public studentId!: Identifier;
-	public submitted!: boolean;
+	public resultId!: Identifier;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
 
 	static associate(models: any) {
-		Examstudent.belongsTo(models?.Exam, {
-			foreignKey: "examId",
-			targetKey: "id",
-			as: "exams",
-		});
-		Examstudent.belongsTo(models?.User, {
+		Studentresult.belongsTo(models?.User, {
 			foreignKey: "studentId",
 			targetKey: "id",
 			as: "students",
 		});
+		Studentresult.belongsTo(models?.User, {
+			foreignKey: "resultId",
+			targetKey: "id",
+			as: "results",
+		});
 	}
 }
-Examstudent.init(
+Studentresult.init(
 	{
-		examId: DataTypes.UUID,
 		studentId: DataTypes.UUID,
-		submitted: DataTypes.BOOLEAN,
+		resultId: DataTypes.UUID,
 	},
 	{
 		sequelize: sequelizeConnection,
-		modelName: "Examstudent",
+		modelName: "Studentresult",
 	}
 );
 
-export default Examstudent;
+export default Studentresult;

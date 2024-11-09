@@ -1,13 +1,12 @@
-import { Identifier, Op, col } from "sequelize";
+import { Identifier, Op, Sequelize, col } from "sequelize";
 
 import {
 	Question,
 	Level,
 	Semester,
-	Session,
 	Department,
 	Course,
-	Questiontype,
+	Option,
 } from "../database/models";
 import addZero from "add-zero";
 
@@ -20,29 +19,29 @@ const createQuestion = async (data: any) => {
 	// As this will be consumed as a service, we might need to do validation directly here
 
 	try {
-		const course = await Course.findOne({
-			where: { id: data.courseId },
+		const name = await generateQuestionName(data.courseId);
+		const { text, type, score, options, courseId } = data;
+
+		// Create the question
+		const question = await Question.create({
+			text,
+			type,
+			score,
+			courseId,
+			name: name,
 		});
-		const courseCode = course.code.replace(/\s+/g, "");
-		const questionNoPrefix = `QS-${courseCode}`;
 
-		// Use LOWER to achieve case-insensitive matching
-		const questionGroup = await Question.count({
-			where: {
-				name: { [Op.like]: `${questionNoPrefix}-%` }, // Change to LIKE
-			},
-		});
+		// Create the options if provided
+		if (options && options.length) {
+			const formattedOptions = options.map((option: any) => ({
+				...option,
+				questionId: question.id,
+			}));
+			const optionList = await Option.bulkCreate(formattedOptions);
+			question.addOptions(optionList);
+		}
 
-		const serialNo = await addZero(questionGroup + 1, 2);
-
-		console.log("result:", questionGroup);
-
-		const questionName = `${questionNoPrefix}-${serialNo}`; // Removed await
-
-		return await Question.create({
-			...data,
-			name: questionName,
-		});
+		return question;
 	} catch (error) {
 		console.log(error);
 		throw error;
@@ -53,14 +52,35 @@ const createQuestion = async (data: any) => {
  *
  * Bulk Create
  */
-const bulkCreateQuestion = async (data: any) => {
+const bulkCreateQuestion = async (data: any, transaction: any) => {
 	// As this will be consumed as a service, we might need to do validation directly here
-
+	const { courseId, questions: questionList } = data;
 	try {
-		console.log(data);
-		return await Question.bulkCreate(data, { returning: true });
+		const questions = [];
+		for (let questionData of questionList) {
+			const { text, type, score, options } = questionData;
+			const name = await generateQuestionName(courseId);
+			const question = await Question.create(
+				{ text, type, score, courseId, name },
+				{ transaction }
+			);
+
+			if (options && options.length) {
+				const formattedOptions = options.map((option: any) => ({
+					...option,
+					questionId: question.id,
+				}));
+				const optionList = await Option.bulkCreate(formattedOptions, {
+					transaction,
+				});
+				question.addOptions(optionList);
+			}
+
+			questions.push(question);
+		}
+
+		return questions;
 	} catch (error) {
-		console.log(error);
 		throw error;
 	}
 };
@@ -69,22 +89,17 @@ const bulkCreateQuestion = async (data: any) => {
  * Get all Questions
  * User: Admin
  */
-
 const getQuestions = async () => {
 	try {
-		return await Question.findAll({
+		const questions = await Question.findAll({
 			attributes: [
 				"id",
-				[col("courses.name"), "course"],
-				[col("questiontypes.name"), "questiontype"],
+				[col("courses.name"), "courseName"],
+				[col("courses.code"), "courseCode"],
 				"name",
-				"questionText",
-				"options",
-				"answer",
-				[col("courses.levels.name"), "level"],
-				[col("courses.semesters.name"), "semester"],
-				[col("courses.departments.name"), "department"],
-				[col("sessions.name"), "session"],
+				"text",
+				"type",
+				"score",
 			],
 			include: [
 				{
@@ -99,17 +114,17 @@ const getQuestions = async () => {
 					],
 				},
 				{
-					model: Questiontype,
+					model: Option,
 					required: false,
-					as: "questiontypes",
-					attributes: [],
+					as: "options",
+					attributes: ["id", "text", "isCorrect"],
+					through: { attributes: [] },
 				},
-				{ model: Session, required: false, as: "sessions", attributes: [] },
-				// { model: Level, required: false, as: "levels", attributes:[]},
-				//{ model: Semester, required: false, as: "semesters", attributes:[]}
 			],
 			order: [["name", "ASC"]],
 		});
+
+		return questions;
 	} catch (error) {
 		throw error;
 	}
@@ -145,21 +160,32 @@ const updateQuestion = async ({
 	///const userId = "2e0fe763-1ddf-4170-9ea7-857ec70ae1d6"
 
 	try {
-		return await Question.update(
-			{
-				questionText: data?.questionText,
-				questiontypeId: data?.questiontypeId,
-				options: data?.options,
-				courseId: data?.courseId,
-				answer: data?.answer,
-			},
-			{
-				where: { id: questionId },
-			}
-		).catch(function (error: any) {
-			throw error;
-		});
-	} catch (error) {}
+		const question = await Question.findByPk(questionId);
+
+		if (!question) {
+			return null;
+		}
+
+		const { text, type, score, options } = data;
+
+		question.text = text || question.text;
+		question.type = type || question.type;
+		question.score = score || question.score;
+		await question.save();
+
+		if (options && options.length) {
+			await Option.destroy({ where: { questionId: questionId } });
+			const newOptions = options.map((option: any) => ({
+				...option,
+				questionId: questionId,
+			}));
+			await Option.bulkCreate(newOptions);
+		}
+
+		return question;
+	} catch (error) {
+		throw error;
+	}
 };
 
 /**
@@ -182,10 +208,63 @@ const getQuestionById = async (data: any) => {
 	try {
 		return await Question.findOne({
 			where: { id: data },
+			attributes: [
+				"id",
+				[col("courses.name"), "course"],
+				"name",
+				"text",
+				[col("courses.levels.name"), "level"],
+				[col("courses.semesters.name"), "semester"],
+				[col("courses.departments.name"), "department"],
+			],
+			include: [
+				{
+					model: Course,
+					required: false,
+					as: "courses",
+					attributes: [],
+					include: [
+						{ model: Department, required: false, as: "departments", attributes: [] },
+						{ model: Semester, required: false, as: "semesters", attributes: [] },
+						{ model: Level, required: false, as: "levels", attributes: [] },
+					],
+				},
+				{
+					model: Option,
+					required: false,
+					as: "options",
+					attributes: [],
+				},
+				// { model: Session, required: false, as: "sessions", attributes: [] },
+				// { model: Level, required: false, as: "levels", attributes:[]},
+				//{ model: Semester, required: false, as: "semesters", attributes:[]}
+			],
 		});
 	} catch (error) {
 		throw error;
 	}
+};
+
+const generateQuestionName = async (courseId: any) => {
+	const course = await Course.findOne({
+		where: { id: courseId },
+	});
+	const courseCode = course.code.replace(/\s+/g, "");
+	const questionNoPrefix = `QS-${courseCode}`;
+
+	const questionGroup = await Question.count({
+		where: {
+			name: { [Op.like]: `${questionNoPrefix}-%` },
+		},
+	});
+
+	const serialNo = addZero(questionGroup + 1, 2);
+
+	console.log("result:", questionGroup);
+
+	const questionName = `${questionNoPrefix}-${serialNo}`;
+
+	return questionName;
 };
 
 export default {

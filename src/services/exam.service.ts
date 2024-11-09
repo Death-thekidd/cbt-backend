@@ -6,6 +6,8 @@ import {
 	Level,
 	Semester,
 	Department,
+	Question,
+	Option,
 } from "../database/models";
 import { Identifier, Op, col } from "sequelize";
 
@@ -86,6 +88,21 @@ const getExams = async () => {
 					as: "sessions",
 					attributes: [],
 				},
+				{
+					model: Question,
+					required: false,
+					as: "questions",
+					attributes: ["id", "name", "type", "text", "topic", "score"],
+					include: [
+						{
+							model: Option,
+							required: false,
+							as: "options",
+							attributes: ["text", "isCorrect"],
+							through: { attributes: [] },
+						},
+					],
+				},
 			],
 			order: [["name", "DESC"]],
 		});
@@ -153,6 +170,20 @@ const getExamById = async (data: any) => {
 					as: "sessions",
 					attributes: ["id"],
 				},
+				{
+					model: Question,
+					required: false,
+					as: "questions",
+					attributes: [],
+					include: [
+						{
+							model: Option,
+							required: false,
+							as: "options",
+							attributes: [],
+						},
+					],
+				},
 			],
 			where: { id: { [Op.eq]: data } },
 		});
@@ -191,17 +222,13 @@ const updateExam = async ({
 	///const userId = "2e0fe763-1ddf-4170-9ea7-857ec70ae1d6"
 
 	try {
-		return await Exam.update(
-			{
-				...data,
-			},
-			{
-				where: { id: examId },
-			}
-		).catch(function (error) {
-			throw error;
-		});
-	} catch (error) {}
+		const exam = await Exam.findByPk(examId);
+		if (!exam) throw new Error("Exam not found");
+		await exam.update(data);
+		return exam;
+	} catch (error) {
+		throw error;
+	}
 };
 
 /**
@@ -209,13 +236,11 @@ const updateExam = async ({
  */
 const deleteExam = async (data: any) => {
 	try {
-		return await Exam.destroy({
-			where: {
-				id: data, //?  data.materialId: matID
-			},
-		});
-	} catch (err) {
-		throw err;
+		const exam = await Exam.findByPk(data);
+		if (!exam) throw new Error("Exam not found");
+		await exam.destroy();
+	} catch (error) {
+		throw error;
 	}
 };
 

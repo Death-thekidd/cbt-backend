@@ -4,20 +4,19 @@ import examquestionService from "../services/examquestion.service";
 import createResponder from "../lib/respondAndLog";
 
 /**
- * Create Examquestion
+ * Add Examquestion
  * User: Admin
  */
-const createExamquestion = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
+const addQuestion = async (req: Request, res: Response): Promise<void> => {
 	const respondAndLog = createResponder(req, res);
-	const activity = "CREATE_QUESTION";
-	const data = req.body;
-	const question = req.body.questionId;
+	const activity = "ADD_QUESTION";
+	const { examId } = req.params;
+	const { questionId } = req.body;
 
 	try {
-		const questionExists = await examquestionService.checkQuestionExist(question);
+		const questionExists = await examquestionService.checkQuestionExist(
+			questionId
+		);
 		if (questionExists) {
 			return respondAndLog({
 				activity,
@@ -27,15 +26,16 @@ const createExamquestion = async (
 			});
 		}
 
-		const examquestion = await examquestionService.createExamquestion({
-			...data,
+		const examquestion = await examquestionService.addQuestion({
+			examId,
+			questionId,
 		});
 		respondAndLog({
 			activity,
 			status: 200,
-			code: "EXAMQUESTION_CREATED",
+			code: "EXAMQUESTION_ADDED",
 			data: examquestion,
-			message: "Examquestion created successfully",
+			message: "Examquestion added successfully",
 		});
 	} catch (error) {
 		console.log(error);
@@ -49,50 +49,56 @@ const createExamquestion = async (
 	}
 };
 
-const bulkCreateExamQuestions = async (
+/***
+ * Get questions for exam
+ */
+const getQuestionsForExam = async (
 	req: Request,
 	res: Response
 ): Promise<void> => {
 	const respondAndLog = createResponder(req, res);
-	const activity = "CREATE_BULK_EXAM_QUESTIONS";
-	const data = req.body;
+	const activity = "FETCH_QUESTIONS_FOR_EXAM";
+	const { examId } = req.params;
 
 	try {
-		const questions = await examquestionService.bulkCreateExamQuestions(data);
+		const examquestions = await examquestionService.getQuestionsForExam(examId);
 		respondAndLog({
 			activity,
 			status: 200,
-			code: "EXAM_QUESTIONS_CREATED",
-			data: questions,
-			message: "Exam questions created successfully",
+			code: "QUESTIONS_FOR_EXAM_FETCHED",
+			data: examquestions,
+			message: "Questions for exam fetched successfully",
 		});
 	} catch (error) {
-		console.log(error);
 		respondAndLog({
 			activity,
 			status: 500,
 			code: "INTERNAL_SERVER_ERROR",
-			errorMessage: error.stack,
+			errorMessage: error.message,
 			message: "Something went wrong, contact support",
 		});
 	}
 };
 
 /***
- * Get Examquestions
+ * Get questions added to exam
  */
-const getExamquestions = async (req: Request, res: Response): Promise<void> => {
+const getAddedQuestions = async (
+	req: Request,
+	res: Response
+): Promise<void> => {
 	const respondAndLog = createResponder(req, res);
-	const activity = "FETCH_ALL_EXAMQUESTIONS";
+	const activity = "FETCH_ADDED_QUESTIONS";
+	const { examId } = req.params;
 
 	try {
-		const examquestions = await examquestionService.getExamquestions();
+		const examquestions = await examquestionService.getAddedQuestions(examId);
 		respondAndLog({
 			activity,
 			status: 200,
-			code: "EXAMQUESTIONS_FETCHED",
+			code: "QUESTIONS_ADDED_FETCHED",
 			data: examquestions,
-			message: "Examquestions fetched successfully",
+			message: "Questions added fetched successfully",
 		});
 	} catch (error) {
 		respondAndLog({
@@ -135,58 +141,25 @@ const countExamquestions = async (
 	}
 };
 
-// Update Examquestion
-const updateExamquestion = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
-	const respondAndLog = createResponder(req, res);
-	const activity = "UPDATE_EXAMQUESTION";
-	const examquestionId = req.params.examquestionId;
-	const name = req.body.name;
-
-	try {
-		const examquestion = await examquestionService.updateExamquestion({
-			examquestionId,
-			data: { name },
-		});
-		respondAndLog({
-			activity,
-			status: 200,
-			code: "EXAMQUESTIONS_UPDATED",
-			data: examquestion,
-			message: "Examquestion updated successfully",
-		});
-	} catch (error) {
-		respondAndLog({
-			activity,
-			status: 500,
-			code: "INTERNAL_SERVER_ERROR",
-			errorMessage: error.message,
-			message: "Something went wrong, contact support",
-		});
-	}
-};
-
 /**
- * Delete Examquestion
+ * Remove Examquestion
  */
-const deleteExamquestions = async (
-	req: Request,
-	res: Response
-): Promise<void> => {
+const removeQuestion = async (req: Request, res: Response): Promise<void> => {
 	const respondAndLog = createResponder(req, res);
-	const activity = "DELETE_EXAMQUESTION";
-	const examquestionId = req.params.examquestionId;
+	const activity = "REMOVE_EXAMQUESTION";
+	const { examId, questionId } = req.params;
 
 	try {
-		const result = await examquestionService.deleteExamquestion(examquestionId);
+		const result = await examquestionService.removeQuestion({
+			examId,
+			questionId,
+		});
 		respondAndLog({
 			activity,
 			status: 200,
-			code: "EXAMQUESTION_DELETED",
+			code: "EXAMQUESTION_REMOVED",
 			data: result,
-			message: "Examquestion deleted successfully",
+			message: "Examquestion removed successfully",
 		});
 	} catch (error) {
 		respondAndLog({
@@ -201,10 +174,9 @@ const deleteExamquestions = async (
 
 // Export all functions as a default object
 export {
-	createExamquestion,
-	bulkCreateExamQuestions,
-	getExamquestions,
+	addQuestion,
+	removeQuestion,
+	getQuestionsForExam,
+	getAddedQuestions,
 	countExamquestions,
-	updateExamquestion,
-	deleteExamquestions,
 };

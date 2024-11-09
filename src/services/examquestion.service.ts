@@ -1,49 +1,186 @@
-import { Examquestion, Question, Faculty, Exam } from "../database/models";
+import {
+	Examquestion,
+	Question,
+	Faculty,
+	Exam,
+	Option,
+	Course,
+} from "../database/models";
 import { Identifier, Op, col } from "sequelize";
 
 /**
- * Create Examquestion
+ * Add question to exam
  * User: Admin
  */
-const createExamquestion = async (data: any) => {
+const addQuestion = async (data: any) => {
+	const { examId, questionId } = data;
 	try {
-		return await Examquestion.create({ ...data });
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
-};
+		const exam = await Exam.findByPk(examId);
+		const question = await Question.findByPk(questionId);
+		if (!exam || !question) throw new Error("Exam or Question not found");
 
-/**
- * Bulk Create
- */
-const bulkCreateExamQuestions = async (data: any) => {
-	try {
-		console.log(data);
-		return await Examquestion.bulkCreate(data, { returning: true });
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
-};
-
-/**
- * Get all Examquestions
- * User: Admin
- */
-const getExamquestions = async () => {
-	try {
-		return await Examquestion.findAll({
+		await exam.addQuestion(question);
+		const updatedQuestions = await exam.getQuestions({
 			attributes: [
-				[col("questions.name"), "qname"],
-				[col("exams.name"), "ename"],
+				"id",
+				[col("courses.name"), "courseName"],
+				[col("courses.code"), "courseCode"],
+				"name",
+				"text",
+				"type",
+				"score",
 			],
 			include: [
-				{ model: Question, required: true, as: "questions", attributes: [] },
-				{ model: Exam, required: true, as: "exams", attributes: [] },
+				{
+					model: Course,
+					required: false,
+					as: "courses",
+					attributes: [],
+				},
+				{ model: Option, as: "options", attributes: ["id", "text", "isCorrect"] },
 			],
-			order: [["qname", "ASC"]],
+			joinTableAttributes: [],
 		});
+
+		return updatedQuestions;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+};
+
+/**
+ * Remove Question from Exam
+ */
+const removeQuestion = async (data: any) => {
+	const { examId, questionId } = data;
+	try {
+		const exam = await Exam.findByPk(examId);
+		const question = await Question.findByPk(questionId);
+
+		if (!exam || !question) throw new Error("Exam or Question not found");
+
+		await exam.removeQuestion(question);
+		const updatedQuestions = await exam.getQuestions({
+			attributes: [
+				"id",
+				[col("courses.name"), "courseName"],
+				[col("courses.code"), "courseCode"],
+				"name",
+				"text",
+				"type",
+				"score",
+			],
+			include: [
+				{
+					model: Course,
+					required: false,
+					as: "courses",
+					attributes: [],
+				},
+				{
+					model: Option,
+					as: "options",
+					attributes: ["id", "text", "isCorrect"],
+					through: { attributes: [] },
+				},
+			],
+			joinTableAttributes: [],
+		});
+
+		return updatedQuestions;
+	} catch (error) {
+		console.error(error);
+		throw error;
+	}
+};
+
+/**
+ * Fetch Questions that match type/course but not already in exam
+ */
+const getQuestionsForExam = async (examId: any) => {
+	try {
+		const exam = await Exam.findByPk(examId);
+		if (!exam) throw new Error("Exam not found");
+
+		// const addedQuestions = await Examquestion.findAll({ where: { examId } });
+		const addedQuestions = await exam.getQuestions();
+		const addedQuestionIds = addedQuestions.map((eq) => eq.id);
+
+		const questions = await Question.findAll({
+			where: {
+				type: exam.type,
+				courseId: exam.courseId,
+				id: { [Op.notIn]: addedQuestionIds },
+			},
+			attributes: [
+				"id",
+				[col("courses.name"), "courseName"],
+				[col("courses.code"), "courseCode"],
+				"name",
+				"text",
+				"type",
+				"score",
+			],
+			include: [
+				{
+					model: Course,
+					required: false,
+					as: "courses",
+					attributes: [],
+				},
+				{
+					model: Option,
+					required: false,
+					as: "options",
+					attributes: ["id", "text", "isCorrect"],
+					through: { attributes: [] },
+				},
+			],
+		});
+
+		return questions;
+	} catch (error) {
+		throw error;
+	}
+};
+
+/**
+ * Fetch Questions already in Exam
+ */
+const getAddedQuestions = async (examId: any) => {
+	try {
+		const exam = await Exam.findByPk(examId);
+		if (!exam) throw new Error("Exam not found");
+
+		const addedQuestions = await exam.getQuestions({
+			attributes: [
+				"id",
+				[col("courses.name"), "courseName"],
+				[col("courses.code"), "courseCode"],
+				"name",
+				"text",
+				"type",
+				"score",
+			],
+			include: [
+				{
+					model: Course,
+					required: false,
+					as: "courses",
+					attributes: [],
+				},
+				{
+					model: Option,
+					as: "options",
+					attributes: ["id", "text", "isCorrect"],
+					through: { attributes: [] },
+				},
+			],
+			joinTableAttributes: [],
+		});
+
+		return addedQuestions;
 	} catch (error) {
 		throw error;
 	}
@@ -55,54 +192,6 @@ const getExamquestions = async () => {
 const countExamquestions = async () => {
 	try {
 		return await Examquestion.count({});
-	} catch (error) {
-		throw error;
-	}
-};
-
-/**
- * Update Examquestion
- */
-const updateExamquestion = async ({
-	examquestionId,
-	data,
-}: {
-	examquestionId: Identifier;
-	data: any;
-}) => {
-	try {
-		return await Examquestion.update(data, {
-			where: {
-				// id: examquestionId
-			},
-		});
-	} catch (error) {
-		console.error(error);
-		throw error;
-	}
-};
-
-/**
- * Delete Examquestion
- */
-const deleteExamquestion = async (examquestionId: Identifier) => {
-	try {
-		return await Examquestion.destroy({
-			where: {
-				// id: examquestionId,
-			},
-		});
-	} catch (error) {
-		throw error;
-	}
-};
-
-// Get Question By ID
-const getQuestionById = async (questionId: Identifier) => {
-	try {
-		return await Question.findOne({
-			where: { id: { [Op.eq]: questionId } },
-		});
 	} catch (error) {
 		throw error;
 	}
@@ -121,12 +210,10 @@ const checkQuestionExist = async (questionId: Identifier) => {
 };
 
 export default {
-	createExamquestion,
-	getExamquestions,
+	addQuestion,
+	removeQuestion,
+	getQuestionsForExam,
+	getAddedQuestions,
 	countExamquestions,
-	updateExamquestion,
-	deleteExamquestion,
-	bulkCreateExamQuestions,
-	getQuestionById,
 	checkQuestionExist,
 };

@@ -6,16 +6,18 @@ module.exports = {
 		await queryInterface.createTable("Examquestions", {
 			examId: {
 				type: Sequelize.UUID,
+				allowNull: false,
 			},
 			questionId: {
 				type: Sequelize.UUID,
+				allowNull: false,
 			},
 			createdAt: {
-				allowNull: false,
+				// allowNull: false,
 				type: Sequelize.DATE,
 			},
 			updatedAt: {
-				allowNull: false,
+				// allowNull: false,
 				type: Sequelize.DATE,
 			},
 		});

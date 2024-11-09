@@ -14,25 +14,35 @@ module.exports = {
 			name: {
 				type: Sequelize.STRING,
 			},
-			sessionId: {
-				type: Sequelize.UUID,
-			},
-			courseId: {
-				type: Sequelize.UUID,
-			},
-			examtypeId: {
-				type: Sequelize.UUID,
-			},
 			startDate: {
 				type: Sequelize.DATE,
+				allowNull: false,
 			},
 			endDate: {
 				type: Sequelize.DATE,
+				allowNull: false,
 			},
 			duration: {
-				type: Sequelize.STRING,
+				type: Sequelize.INTEGER,
+				allowNull: false,
 			},
 			instruction: { type: Sequelize.TEXT, allowNull: true },
+			type: {
+				type: Sequelize.ENUM("MCQ", "Medical"),
+				allowNull: false,
+			},
+			status: {
+				type: Sequelize.ENUM("Open", "Close"),
+				allowNull: false,
+			},
+			courseId: {
+				type: Sequelize.UUID,
+				allowNull: false,
+			},
+			sessionId: {
+				type: Sequelize.UUID,
+				allowNull: false,
+			},
 			createdAt: {
 				allowNull: false,
 				type: Sequelize.DATE,

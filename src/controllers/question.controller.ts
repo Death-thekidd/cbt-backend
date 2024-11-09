@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import questionService from "../services/question.service";
 import createResponder from "../lib/respondAndLog";
+import sequelize from "../database/connection";
+import { Transaction } from "sequelize";
+import { validationResult } from "express-validator";
 
 const questionController = {
 	/**
@@ -10,6 +13,10 @@ const questionController = {
 	createQuestion: async (req: Request, res: Response) => {
 		const respondAndLog = createResponder(req, res);
 		const activity = "CREATE_QUESTION";
+		const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
 		const data = req.body;
 
 		try {
@@ -37,9 +44,13 @@ const questionController = {
 		const respondAndLog = createResponder(req, res);
 		const activity = "CREATE_BULK_QUESTIONS";
 		const data = req.body;
-
+		const transaction = await sequelize.transaction();
 		try {
-			const questions = await questionService.bulkCreateQuestion(data);
+			const questions = await questionService.bulkCreateQuestion(
+				data,
+				transaction
+			);
+			await transaction.commit();
 			respondAndLog({
 				activity,
 				status: 200,
@@ -48,6 +59,7 @@ const questionController = {
 				message: "Questions created successfully",
 			});
 		} catch (error) {
+			await transaction.rollback();
 			console.error(error);
 			respondAndLog({
 				activity,

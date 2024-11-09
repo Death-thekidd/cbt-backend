@@ -1,12 +1,4 @@
-import {
-	User,
-	Examresult,
-	Exam,
-	Course,
-	Session,
-	Level,
-	Department,
-} from "../database/models";
+import { User } from "../database/models";
 import { Identifier, Op, col } from "sequelize";
 import on from "../lib/on";
 
@@ -36,69 +28,6 @@ const getUserByEmail = async (email: string) => {
 	const [err, userObj] = await on(
 		User.findOne({
 			where: { email: { [Op.eq]: email } },
-		})
-	);
-
-	if (err) throw err;
-
-	return userObj;
-};
-
-const getUserExamsById = async (userId: Identifier) => {
-	const [err, userObj] = await on(
-		Examresult.findAll({
-			attributes: [
-				"id",
-				[col("exams.courses.code"), "course"],
-				[col("exams.courses.departments.name"), "department"],
-				[col("exams.courses.levels.name"), "level"],
-				[col("exams.sessions.name"), "session"],
-				"answers",
-				"questions",
-				"startTime",
-				"endTime",
-			],
-			include: [
-				{
-					model: User,
-					required: true,
-					as: "users",
-					attributes: [],
-				},
-				{
-					model: Exam,
-					required: true,
-					as: "exams",
-					include: [
-						{
-							model: Session,
-							required: true,
-							as: "sessions",
-							attributes: [],
-						},
-						{
-							model: Course,
-							required: true,
-							as: "courses",
-							include: [
-								{
-									model: Department,
-									required: true,
-									as: "departments",
-									attributes: [],
-								},
-								{
-									model: Level,
-									required: true,
-									as: "levels",
-									attributes: [],
-								},
-							],
-						},
-					],
-				},
-			],
-			where: { userId: { [Op.eq]: userId } },
 		})
 	);
 
@@ -171,7 +100,6 @@ export default {
 	getAllUsers,
 	getUser,
 	getUserByEmail,
-	getUserExamsById,
 	createUser,
 	updateUserByEmail,
 	updateUserById,

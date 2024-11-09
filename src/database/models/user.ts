@@ -8,6 +8,7 @@ export interface UserAttributes {
 	email: string;
 	password: string;
 	role: string;
+	// matricNo: string;
 	canLogin: boolean;
 	phone: string;
 	gender: string;
@@ -28,6 +29,7 @@ class User extends Model<UserAttributes> implements UserAttributes {
 	public email!: string;
 	public password!: string;
 	public role!: string;
+	// public matricNo!: string;
 	public canLogin!: boolean;
 	public phone!: string;
 	public gender!: string;
@@ -36,7 +38,18 @@ class User extends Model<UserAttributes> implements UserAttributes {
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
 
-	static associate(models: any) {}
+	static associate(models: any) {
+		User.belongsToMany(models?.Exam, {
+			through: "Examstudents",
+			foreignKey: "studentId",
+			as: "exams",
+		});
+		User.belongsToMany(models.Result, {
+			foreignKey: "studentId",
+			through: "Studentresults",
+			as: "results",
+		});
+	}
 }
 User.init(
 	{
@@ -56,6 +69,7 @@ User.init(
 		},
 		password: DataTypes.STRING,
 		role: DataTypes.STRING,
+		// matricNo: DataTypes.STRING,
 		canLogin: DataTypes.BOOLEAN,
 		phone: DataTypes.STRING,
 		gender: DataTypes.STRING,

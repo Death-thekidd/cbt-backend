@@ -9,10 +9,9 @@ import levelRouter from "../routers/level.router";
 import courseRouter from "../routers/course.router";
 import examRouter from "../routers/exam.router";
 import examquestionRouter from "../routers/examquestion.router";
-import examresultRouter from "../routers/examresult.router";
-import examtypeRouter from "../routers/examtype.router";
+import examresultRouter from "./result.router";
+import examstudentRouter from "../routers/examstudent.router";
 import questionRouter from "../routers/question.router";
-import questiontypeRouter from "../routers/questiontype.router";
 
 const router = Router();
 
@@ -27,8 +26,7 @@ router.use("/courses", courseRouter);
 router.use("/exams", examRouter);
 router.use("/examquestions", examquestionRouter);
 router.use("/examresults", examresultRouter);
-router.use("/examtypes", examtypeRouter);
+router.use("/examstudents", examstudentRouter);
 router.use("/questions", questionRouter);
-router.use("/questiontypes", questiontypeRouter);
 
 export default router;
