@@ -1,5 +1,13 @@
-import { Model, DataTypes, Identifier } from "sequelize";
+import {
+	Model,
+	DataTypes,
+	Identifier,
+	BelongsToManyAddAssociationsMixinOptions,
+	BelongsToManyAddAssociationMixinOptions,
+	BelongsToManyGetAssociationsMixinOptions,
+} from "sequelize";
 import sequelizeConnection from "../connection";
+import Exam from "./exam";
 
 export interface UserAttributes {
 	id?: Identifier;
@@ -37,6 +45,20 @@ class User extends Model<UserAttributes> implements UserAttributes {
 	public picUrl!: string;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
+
+	addExams: (
+		exams: Exam[],
+		options?: BelongsToManyAddAssociationsMixinOptions
+	) => Promise<Exam[]>;
+	addExam: (
+		exam: Exam,
+		options?: BelongsToManyAddAssociationMixinOptions
+	) => Promise<User>;
+	removeExam: (student: User) => Promise<Exam[]>;
+	Exams: Exam[];
+	getExams: (
+		exams?: BelongsToManyGetAssociationsMixinOptions
+	) => Promise<Exam[]>;
 
 	static associate(models: any) {
 		User.belongsToMany(models?.Exam, {

@@ -8,6 +8,7 @@ import {
 	Department,
 	Question,
 	Option,
+	User,
 } from "../database/models";
 import { Identifier, Op, col } from "sequelize";
 
@@ -192,6 +193,86 @@ const getExamById = async (data: any) => {
 	}
 };
 
+const getStudentExams = async (studentId: number) => {
+	try {
+		// Find the student by ID and use the getExams association method
+		const student = await User.findByPk(studentId);
+		if (!student) throw new Error("Student not found");
+
+		// Fetch exams with nested details
+		const exams = await student.getExams({
+			attributes: [
+				"id",
+				"name",
+				"startDate",
+				"endDate",
+				"duration",
+				[col("courses.code"), "course"],
+				[col("courses.departments.name"), "department"],
+				[col("courses.departments.faculties.name"), "faculty"],
+				[col("courses.levels.name"), "level"],
+				[col("courses.semesters.name"), "semester"],
+				[col("sessions.name"), "session"],
+			],
+			include: [
+				{
+					model: Course,
+					as: "courses",
+					attributes: [],
+					include: [
+						{
+							model: Level,
+							as: "levels",
+							attributes: [],
+						},
+						{
+							model: Department,
+							as: "departments",
+							attributes: [],
+							include: [
+								{
+									model: Faculty,
+									as: "faculties",
+									attributes: [],
+								},
+							],
+						},
+						{
+							model: Semester,
+							as: "semesters",
+							attributes: [],
+						},
+					],
+				},
+				{
+					model: Session,
+					as: "sessions",
+					attributes: [],
+				},
+				{
+					model: Question,
+					as: "questions",
+					attributes: ["id", "name", "type", "text", "topic", "score"],
+					include: [
+						{
+							model: Option,
+							as: "options",
+							attributes: ["text", "isCorrect"],
+							through: { attributes: [] },
+						},
+					],
+				},
+			],
+			order: [["name", "DESC"]],
+			joinTableAttributes: ["submitted"], // Include the 'submitted' attribute from the join table
+		});
+
+		return exams;
+	} catch (error) {
+		throw error;
+	}
+};
+
 /**
  * Count Exams
  */
@@ -251,4 +332,5 @@ export default {
 	countExams,
 	updateExam,
 	deleteExam,
+	getStudentExams,
 };

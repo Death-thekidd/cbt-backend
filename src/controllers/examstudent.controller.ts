@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import on from "../lib/on";
 import examstudentService from "../services/examstudent.service";
 import createResponder from "../lib/respondAndLog";
+import examService from "../services/exam.service";
 
 /**
  * Add Examstudent
@@ -100,6 +101,34 @@ const getAddedStudents = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
+ * Fetch exams for a specific student
+ */
+const getStudentExams = async (req: Request, res: Response): Promise<void> => {
+	const respondAndLog = createResponder(req, res);
+	const activity = "FETCH_STUDENT_EXAMS";
+	const { studentId } = req.params;
+
+	try {
+		const exams = await examService.getStudentExams(Number(studentId));
+		respondAndLog({
+			activity,
+			status: 200,
+			code: "STUDENT_EXAMS_FETCHED",
+			data: exams,
+			message: "Exams fetched successfully for the student",
+		});
+	} catch (error) {
+		respondAndLog({
+			activity,
+			status: 500,
+			code: "INTERNAL_SERVER_ERROR",
+			errorMessage: error.message,
+			message: "Something went wrong, contact support",
+		});
+	}
+};
+
+/**
  * Remove Examstudent
  */
 const removeStudent = async (req: Request, res: Response): Promise<void> => {
@@ -131,4 +160,10 @@ const removeStudent = async (req: Request, res: Response): Promise<void> => {
 };
 
 // Export all functions as a default object
-export { addStudents, getAddedStudents, removeStudent, addStudents2 };
+export {
+	addStudents,
+	getAddedStudents,
+	removeStudent,
+	addStudents2,
+	getStudentExams,
+};
