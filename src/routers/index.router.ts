@@ -25,7 +25,7 @@ router.use("/levels", levelRouter);
 router.use("/courses", courseRouter);
 router.use("/exams", examRouter);
 router.use("/examquestions", examquestionRouter);
-router.use("/examresults", examresultRouter);
+router.use("/results", examresultRouter);
 router.use("/examstudents", examstudentRouter);
 router.use("/questions", questionRouter);
 

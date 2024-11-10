@@ -14,6 +14,6 @@ router.post("/submit", submitExamResult);
 router.get("/:studentId/:examId", getExamResult);
 
 // Route to fetch all results for a specific exam
-router.get("/exam/:examId", getAllExamResults);
+router.get("/:examId", getAllExamResults);
 
 export = router;
