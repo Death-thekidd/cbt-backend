@@ -31,19 +31,20 @@ class Option extends Model<OptionAttributes> implements OptionAttributes {
 	public questionId!: Identifier;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
-	addAnswers: (
-		answers: Answer[],
-		options?: BelongsToManyAddAssociationsMixinOptions
-	) => Promise<Answer[]>;
-	addAnswer: (
-		answer: Answer,
-		options?: BelongsToManyAddAssociationMixinOptions
-	) => Promise<Answer>;
-	removeAnswer: (answer: Answer) => Promise<Answer[]>;
-	Answers: Answer[];
-	getAnswers: (
-		options?: BelongsToManyGetAssociationsMixinOptions
-	) => Promise<Answer[]>;
+
+	// addAnswers: (
+	// 	answers: Answer[],
+	// 	options?: BelongsToManyAddAssociationsMixinOptions
+	// ) => Promise<Answer[]>;
+	// addAnswer: (
+	// 	answer: Answer,
+	// 	options?: BelongsToManyAddAssociationMixinOptions
+	// ) => Promise<Answer>;
+	// removeAnswer: (answer: Answer) => Promise<Answer[]>;
+	// Answers: Answer[];
+	// getAnswers: (
+	// 	options?: BelongsToManyGetAssociationsMixinOptions
+	// ) => Promise<Answer[]>;
 
 	static associate(models: any) {
 		Option.belongsTo(models.Exam, {
@@ -51,11 +52,11 @@ class Option extends Model<OptionAttributes> implements OptionAttributes {
 			targetKey: "id",
 			as: "exams",
 		});
-		Option.belongsToMany(models?.Answer, {
-			through: "Optionanswers",
-			foreignKey: "optionId",
-			as: "answers",
-		});
+		// Option.belongsToMany(models?.Answer, {
+		// 	through: "Optionanswers",
+		// 	foreignKey: "optionId",
+		// 	as: "answers",
+		// });
 		Option.belongsToMany(models?.Question, {
 			through: "Questionoptions",
 			foreignKey: "optionId",

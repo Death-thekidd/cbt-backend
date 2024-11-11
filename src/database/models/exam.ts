@@ -75,30 +75,29 @@ class Exam extends Model<ExamAttributes> implements ExamAttributes {
 		options?: BelongsToManyGetAssociationsMixinOptions
 	) => Promise<User[]>;
 
-	addResults: (
-		results: Result[],
-		options?: BelongsToManyAddAssociationsMixinOptions
-	) => Promise<Result[]>;
-	addResult: (
-		result: Result,
-		options?: BelongsToManyAddAssociationMixinOptions
-	) => Promise<Result>;
-	removeResult: (result: Result) => Promise<Result[]>;
-	Results: Result[];
-	getResults: (
-		options?: BelongsToManyGetAssociationsMixinOptions
-	) => Promise<Result[]>;
+	// addResults: (
+	// 	results: Result[],
+	// 	options?: BelongsToManyAddAssociationsMixinOptions
+	// ) => Promise<Result[]>;
+	// addResult: (
+	// 	result: Result,
+	// 	options?: BelongsToManyAddAssociationMixinOptions
+	// ) => Promise<Result>;
+	// removeResult: (result: Result) => Promise<Result[]>;
+	// getResults: (
+	// 	options?: BelongsToManyGetAssociationsMixinOptions
+	// ) => Promise<Result[]>;
 
 	static associate(models: any) {
 		Exam.belongsTo(models.Course, {
 			foreignKey: "courseId",
 			targetKey: "id",
-			as: "courses",
+			as: "course",
 		});
 		Exam.belongsTo(models.Session, {
 			foreignKey: "sessionId",
 			targetKey: "id",
-			as: "sessions",
+			as: "session",
 		});
 		Exam.belongsToMany(models?.Question, {
 			through: "Examquestions",
@@ -110,11 +109,11 @@ class Exam extends Model<ExamAttributes> implements ExamAttributes {
 			foreignKey: "examId",
 			as: "students",
 		});
-		Exam.belongsToMany(models.Result, {
-			foreignKey: "examId",
-			through: "Examresults",
-			as: "results",
-		});
+		// Exam.belongsToMany(models.Result, {
+		// 	foreignKey: "examId",
+		// 	through: "Examresults",
+		// 	as: "results",
+		// });
 	}
 }
 Exam.init(

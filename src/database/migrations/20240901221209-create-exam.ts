@@ -34,6 +34,7 @@ module.exports = {
 			status: {
 				type: Sequelize.ENUM("Open", "Close"),
 				allowNull: false,
+				defaultValue: "Close",
 			},
 			courseId: {
 				type: Sequelize.UUID,

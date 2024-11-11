@@ -23,8 +23,8 @@ const addQuestion = async (data: any) => {
 		const updatedQuestions = await exam.getQuestions({
 			attributes: [
 				"id",
-				[col("courses.name"), "courseName"],
-				[col("courses.code"), "courseCode"],
+				[col("course.name"), "courseName"],
+				[col("course.code"), "courseCode"],
 				"name",
 				"text",
 				"type",
@@ -34,7 +34,7 @@ const addQuestion = async (data: any) => {
 				{
 					model: Course,
 					required: false,
-					as: "courses",
+					as: "course",
 					attributes: [],
 				},
 				{ model: Option, as: "options", attributes: ["id", "text", "isCorrect"] },
@@ -64,8 +64,8 @@ const removeQuestion = async (data: any) => {
 		const updatedQuestions = await exam.getQuestions({
 			attributes: [
 				"id",
-				[col("courses.name"), "courseName"],
-				[col("courses.code"), "courseCode"],
+				[col("course.name"), "courseName"],
+				[col("course.code"), "courseCode"],
 				"name",
 				"text",
 				"type",
@@ -75,7 +75,7 @@ const removeQuestion = async (data: any) => {
 				{
 					model: Course,
 					required: false,
-					as: "courses",
+					as: "course",
 					attributes: [],
 				},
 				{
@@ -115,8 +115,8 @@ const getQuestionsForExam = async (examId: any) => {
 			},
 			attributes: [
 				"id",
-				[col("courses.name"), "courseName"],
-				[col("courses.code"), "courseCode"],
+				[col("course.name"), "courseName"],
+				[col("course.code"), "courseCode"],
 				"name",
 				"text",
 				"type",
@@ -126,7 +126,7 @@ const getQuestionsForExam = async (examId: any) => {
 				{
 					model: Course,
 					required: false,
-					as: "courses",
+					as: "course",
 					attributes: [],
 				},
 				{
@@ -156,8 +156,8 @@ const getAddedQuestions = async (examId: any) => {
 		const addedQuestions = await exam.getQuestions({
 			attributes: [
 				"id",
-				[col("courses.name"), "courseName"],
-				[col("courses.code"), "courseCode"],
+				[col("course.name"), "courseName"],
+				[col("course.code"), "courseCode"],
 				"name",
 				"text",
 				"type",
@@ -167,7 +167,7 @@ const getAddedQuestions = async (examId: any) => {
 				{
 					model: Course,
 					required: false,
-					as: "courses",
+					as: "course",
 					attributes: [],
 				},
 				{

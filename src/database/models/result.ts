@@ -27,15 +27,15 @@ class Result extends Model<ResultAttributes> implements ResultAttributes {
 	public readonly createdAt!: Date;
 
 	static associate(models: any) {
-		Result.belongsToMany(models.Exam, {
-			foreignKey: "resultId",
-			through: "ExamResults",
-			as: "exams",
+		Result.belongsTo(models.Exam, {
+			foreignKey: "examId",
+			targetKey: "id",
+			as: "exam",
 		});
-		Result.belongsToMany(models.User, {
-			foreignKey: "resultId",
-			through: "StudentResults",
-			as: "students",
+		Result.belongsTo(models.User, {
+			foreignKey: "studentId",
+			targetKey: "id",
+			as: "student",
 		});
 	}
 }

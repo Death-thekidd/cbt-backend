@@ -109,7 +109,7 @@ const getStudentExams = async (req: Request, res: Response): Promise<void> => {
 	const { studentId } = req.params;
 
 	try {
-		const exams = await examService.getStudentExams(Number(studentId));
+		const exams = await examService.getStudentExams(studentId);
 		respondAndLog({
 			activity,
 			status: 200,

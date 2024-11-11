@@ -25,10 +25,8 @@ const createDepartment = async (data: any) => {
 const getDepartments = async () => {
 	try {
 		return await Department.findAll({
-			attributes: ["id", "name", [col("faculties.name"), "faculty"]],
-			include: [
-				{ model: Faculty, required: true, as: "faculties", attributes: [] },
-			],
+			attributes: ["id", "name", [col("faculty.name"), "faculty"]],
+			include: [{ model: Faculty, required: true, as: "faculty", attributes: [] }],
 			order: [["name", "DESC"]],
 		});
 	} catch (error) {

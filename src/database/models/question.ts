@@ -1,7 +1,16 @@
-import { Model, DataTypes, Identifier, EnumDataType } from "sequelize";
+import {
+	Model,
+	DataTypes,
+	Identifier,
+	EnumDataType,
+	BelongsToManyAddAssociationsMixinOptions,
+	BelongsToManyAddAssociationMixinOptions,
+	BelongsToManyGetAssociationsMixinOptions,
+} from "sequelize";
 import sequelizeConnection from "../connection";
 import Course from "./course";
 import Option, { OptionAttributes } from "./option";
+import Answer from "./answer";
 
 export interface QuestionAttributes {
 	id?: Identifier;
@@ -30,15 +39,37 @@ class Question extends Model<QuestionAttributes> implements QuestionAttributes {
 	public courseId!: Identifier;
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
-	Options: Option[];
-	addOptions: (options: Option[]) => Promise<any>;
-	removeOption: () => Promise<any>;
+	addOptions: (
+		optionsData: Option[],
+		options?: BelongsToManyAddAssociationsMixinOptions
+	) => Promise<Question[]>;
+	addOption: (
+		optionData: Option,
+		options?: BelongsToManyAddAssociationMixinOptions
+	) => Promise<Question>;
+	removeOption: (optionData: Option) => Promise<Option[]>;
+	getOptions: (
+		options?: BelongsToManyGetAssociationsMixinOptions
+	) => Promise<Option[]>;
+
+	addAnswers: (
+		answers: Answer[],
+		options?: BelongsToManyAddAssociationsMixinOptions
+	) => Promise<Answer[]>;
+	addAnswer: (
+		answer: Answer,
+		options?: BelongsToManyAddAssociationMixinOptions
+	) => Promise<Answer>;
+	removeAnswer: (answer: Answer) => Promise<Answer[]>;
+	getAnswers: (
+		options?: BelongsToManyGetAssociationsMixinOptions
+	) => Promise<Answer[]>;
 
 	static associate(models: any) {
 		Question.belongsTo(models.Course, {
 			foreignKey: "courseId",
 			targetKey: "id",
-			as: "courses",
+			as: "course",
 		});
 		Question.belongsToMany(models?.Exam, {
 			through: "Examquestions",

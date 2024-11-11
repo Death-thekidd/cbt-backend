@@ -15,9 +15,6 @@ import Option from "./option";
 import Examstudent from "./examstudent";
 import Questionoption from "./questionoption";
 import Questionanswer from "./questionanswer";
-import Optionanswer from "./optionanswer";
-import Examresult from "./examresult";
-import Studentresult from "./studentresult";
 
 // Define a type for the models
 type Models = {
@@ -38,9 +35,6 @@ type Models = {
 	Option: typeof Option;
 	Questionoption: typeof Questionoption;
 	Questionanswer: typeof Questionanswer;
-	Optionanswer: typeof Optionanswer;
-	Examresult: typeof Examresult;
-	Studentresult: typeof Studentresult;
 };
 
 // Create the models object
@@ -62,9 +56,6 @@ const models: Models = {
 	Option,
 	Questionoption,
 	Questionanswer,
-	Optionanswer,
-	Examresult,
-	Studentresult,
 };
 
 // Loop through each model and call associate
@@ -93,7 +84,4 @@ export {
 	Option,
 	Questionoption,
 	Questionanswer,
-	Optionanswer,
-	Examresult,
-	Studentresult,
 };

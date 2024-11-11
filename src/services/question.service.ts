@@ -94,8 +94,8 @@ const getQuestions = async () => {
 		const questions = await Question.findAll({
 			attributes: [
 				"id",
-				[col("courses.name"), "courseName"],
-				[col("courses.code"), "courseCode"],
+				[col("course.name"), "courseName"],
+				[col("course.code"), "courseCode"],
 				"name",
 				"text",
 				"type",
@@ -105,12 +105,12 @@ const getQuestions = async () => {
 				{
 					model: Course,
 					required: false,
-					as: "courses",
+					as: "course",
 					attributes: [],
 					include: [
-						{ model: Department, required: false, as: "departments", attributes: [] },
-						{ model: Semester, required: false, as: "semesters", attributes: [] },
-						{ model: Level, required: false, as: "levels", attributes: [] },
+						{ model: Department, required: false, as: "department", attributes: [] },
+						{ model: Semester, required: false, as: "semester", attributes: [] },
+						{ model: Level, required: false, as: "level", attributes: [] },
 					],
 				},
 				{

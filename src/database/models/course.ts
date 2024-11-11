@@ -30,20 +30,21 @@ class Course extends Model<CourseAttributes> implements CourseAttributes {
 	public readonly createdAt!: Date;
 
 	static associate(models: any) {
+		// Course.hasMany(models.Exam, { foreignKey: "courseId" });
 		Course.belongsTo(models.Department, {
 			foreignKey: "departmentId",
 			targetKey: "id",
-			as: "departments",
+			as: "department",
 		});
 		Course.belongsTo(models.Level, {
 			foreignKey: "levelId",
 			targetKey: "id",
-			as: "levels",
+			as: "level",
 		});
 		Course.belongsTo(models.Semester, {
 			foreignKey: "semesterId",
 			targetKey: "id",
-			as: "semesters",
+			as: "semester",
 		});
 	}
 }

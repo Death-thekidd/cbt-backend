@@ -18,7 +18,9 @@ class Session extends Model<SessionAttributes> implements SessionAttributes {
 	public readonly updatedAt!: Date;
 	public readonly createdAt!: Date;
 
-	static associate(models: any) {}
+	static associate(models: any) {
+		// Session.hasMany(models.Exam, { foreignKey: "sessionId" });
+	}
 }
 Session.init(
 	{

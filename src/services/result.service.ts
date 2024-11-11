@@ -1,6 +1,5 @@
 import { listenerCount } from "process";
 import {
-	Examresult,
 	User,
 	Course,
 	Exam,
@@ -30,17 +29,49 @@ interface ExtendedResult extends Result {
 	studentName?: string;
 	studentEmail?: string;
 	studentMatricNo?: string;
-	exams?: Exam & {
-		questions?: Question &
-			{
-				answers?: Answer &
-					{
-						optionText?: string;
-						optionIsTrueorFalse?: boolean;
-					}[];
-			}[];
+	totalScore: number;
+	startTime: Date;
+	endTime: Date;
+
+	exam?: {
+		name?: string;
+		type?: string;
+		duration?: number;
+		instruction?: string;
+		startDate?: Date;
+		endDate?: Date;
+
+		session?: {
+			name?: string;
+		};
+		course?: {
+			name?: string;
+			code?: string;
+		};
+
+		questions?: Array<{
+			text?: string;
+			type?: "MCQ" | "Medical"; // Define more types if necessary
+			score?: number;
+
+			answers?: Array<{
+				isCorrect?: boolean;
+				score?: number;
+				studentTrueOrFalse?: boolean;
+
+				options?: Array<{
+					text?: string;
+					isCorrect?: boolean;
+				}>;
+			}>;
+		}>;
 	};
-	students?: User;
+
+	student?: {
+		name?: string;
+		email?: string;
+		idNumber?: string;
+	};
 }
 
 /**
@@ -72,38 +103,46 @@ const submitExamresult = async (data: any) => {
 		// Loop through each answer submitted by the student
 		for (const answer of answers) {
 			const { questionId, selectedOptions } = answer;
-			const question = exam.Questions.find((q) => q.id === questionId);
+			const questions = await exam.getQuestions();
+			const question = questions.find((q) => q.id === questionId);
+			const options = await question.getOptions();
 			if (!question) throw new Error(`Invalid question ID: ${questionId}`);
 
 			let questionScore = 0;
-			const optionScore = question.score / question.Options.length; // Evenly distributed question score
+			const optionScore = question.score / options.length; // Evenly distributed question score
 
 			if (question.type === "MCQ") {
 				const selectedOption = selectedOptions[0];
-				const correctOption = question.Options.find((o) => o.isCorrect);
-				const isCorrect = correctOption?.id === selectedOption.optionId;
 
-				// Full score or zero based on correctness
-				questionScore = isCorrect ? question.score : 0;
+				// Check if the student selected an option
+				if (!selectedOption) {
+					questionScore = 0; // No score if no option selected
+				} else {
+					const correctOption = options.find((o) => o.isCorrect);
+					const isCorrect = correctOption?.id === selectedOption.optionId;
 
-				// Save the answer via Option's addAnswer method
-				const answerCreated = await Answer.create(
-					{
-						studentId,
-						questionId,
-						optionId: selectedOption.optionId,
-						isCorrect,
-						studentTrueOrFalse: selectedOption.trueOrFalse,
-						score: questionScore,
-					},
-					{ transaction }
-				);
-				await correctOption?.addAnswer(answerCreated, { transaction });
+					// Full score or zero based on correctness
+					questionScore = isCorrect ? question.score : 0;
+
+					// Save the answer via Option's addAnswer method
+					const answerCreated = await Answer.create(
+						{
+							examId,
+							studentId,
+							questionId,
+							optionId: selectedOption.optionId,
+							isCorrect,
+							studentTrueOrFalse: selectedOption.trueOrFalse,
+							score: questionScore,
+						},
+						{ transaction }
+					);
+					await question?.addAnswer(answerCreated, { transaction });
+				}
 			} else if (question.type === "Medical") {
 				for (const selectedOption of selectedOptions) {
-					const option = question.Options.find(
-						(o) => o.id === selectedOption.optionId
-					);
+					const options = await question.getOptions();
+					const option = options.find((o) => o.id === selectedOption.optionId);
 					if (!option) continue;
 
 					const isCorrect = option.isCorrect === selectedOption.trueOrFalse;
@@ -118,6 +157,7 @@ const submitExamresult = async (data: any) => {
 					// Save the answer for each option in Medical questions
 					const answerCreated = await Answer.create(
 						{
+							examId,
 							studentId,
 							questionId,
 							optionId: option.id,
@@ -127,7 +167,7 @@ const submitExamresult = async (data: any) => {
 						},
 						{ transaction }
 					);
-					await option.addAnswer(answerCreated, { transaction });
+					await question.addAnswer(answerCreated, { transaction });
 				}
 			}
 
@@ -147,9 +187,6 @@ const submitExamresult = async (data: any) => {
 			{ transaction }
 		);
 
-		// Add the result to the exam using Exam's addResult method
-		await exam.addResult(result, { transaction });
-
 		// Update ExamStudent to mark exam as submitted for the student
 		await Examstudent.update(
 			{ submitted: true },
@@ -164,90 +201,95 @@ const submitExamresult = async (data: any) => {
 
 		return result;
 	} catch (error) {
-		if (transaction) await transaction.rollback();
 		throw error;
 	}
 };
 
-const fetchExamResult = async (studentId: string, examId: string) => {
+const fetchExamResult = async (studentId: any, examId: any) => {
+	console.log(`\nFetching Exam Result for Student...\n`);
 	try {
-		const result: ExtendedResult = await Result.findOne({
+		const result: any = await Result.findOne({
 			where: { studentId, examId },
-			attributes: [
-				"totalScore",
-				"startTime",
-				"endTime",
-				[col("exams.name"), "examName"],
-				[col("exams.type"), "examType"],
-				[col("exams.startDate"), "examStartDate"],
-				[col("exams.endDate"), "examEndDate"],
-				[col("exams.duration"), "examDuration"],
-				[col("exams.instruction"), "examInstruction"],
-				[col("exams.sessions.name"), "sessionName"],
-				[col("exams.courses.name"), "courseName"],
-				[col("exams.courses.code"), "courseCode"],
-				[col("students.name"), "studentName"],
-				[col("students.email"), "studentEmail"],
-				[col("students.idNumber"), "studentMatricNo"],
-			],
+			attributes: ["totalScore", "startTime", "endTime"],
 			include: [
 				{
 					model: Exam,
-					as: "exams",
-					required: true,
+					as: "exam",
+					required: false,
+					attributes: [
+						"id",
+						"name",
+						"type",
+						"startDate",
+						"endDate",
+						"duration",
+						"instruction",
+					],
 					include: [
+						{
+							model: Course,
+							as: "course",
+							required: false,
+							attributes: ["name", "code"],
+						},
+						{
+							model: Session,
+							as: "session",
+							required: false,
+							attributes: ["name"],
+						},
 						{
 							model: Question,
 							as: "questions",
+							required: false,
+							through: { attributes: [] },
+							attributes: ["text", "type", "score"],
 							include: [
 								{
 									model: Answer,
-									attributes: [
-										"isCorrect",
-										"score",
-										"studentTrueOrFalse",
-										[col("options.text"), "optionText"],
-										[col("options.isCorrect"), "optionIsTrueorFalse"],
-									],
 									as: "answers",
+									required: false,
+									through: { attributes: [] },
+									attributes: ["isCorrect", "score", "studentTrueOrFalse"],
 									where: { studentId },
 									include: [
 										{
 											model: Option,
-											as: "options",
+											as: "option",
+											required: false,
+											attributes: ["text", "isCorrect"],
 										},
 									],
 								},
 							],
 						},
-						{ model: Session, as: "sessions" },
-						{ model: Course, as: "courses" },
 					],
 				},
 				{
 					model: User,
-					as: "students",
+					as: "student",
+					required: false,
+					attributes: ["firstName", "lastName", "email", "idNumber"],
 				},
 			],
 		});
+
+		console.log(result);
 
 		if (!result) {
 			throw new Error("Exam result not found.");
 		}
 
-		const formattedQuestions = result.exams.questions.map((question: any) => {
-			const formattedOptions = question.answers.map((answer: any) => {
-				return {
-					optionText: answer.optionText,
-					isCorrect:
-						question.type === "MCQ" ? answer.optionIsTrueorFalse : undefined,
-					studentTrueOrFalse:
-						question.type === "Medical" ? answer.studentTrueOrFalse : undefined,
-					correctAnswer:
-						question.type === "Medical" ? answer.optionIsTrueorFalse : undefined,
-					score: question.type === "Medical" ? answer.score : undefined,
-				};
-			});
+		const formattedQuestions = result.exam.questions.map((question: any) => {
+			const formattedOptions = question.answers.map((answer: any) => ({
+				optionText: answer.option ? answer.option.text : null,
+				isCorrect: question.type === "MCQ" ? answer.option?.isCorrect : undefined,
+				studentTrueOrFalse:
+					question.type === "Medical" ? answer.studentTrueOrFalse : undefined,
+				correctAnswer:
+					question.type === "Medical" ? answer.option?.isCorrect : undefined,
+				score: question.type === "Medical" ? answer.score : undefined,
+			}));
 
 			return {
 				questionText: question.text,
@@ -259,26 +301,28 @@ const fetchExamResult = async (studentId: string, examId: string) => {
 
 		return {
 			examDetails: {
-				name: result.examName,
-				type: result.examType,
-				duration: result.examDuration,
-				instruction: result.examInstruction,
+				name: result.exam.name,
+				type: result.exam.type,
+				duration: result.exam.duration,
+				instruction: result.exam.instruction,
 				course: {
-					name: result.courseName,
-					code: result.courseCode,
+					name: result.exam.course ? result.exam.course.name : null,
+					code: result.exam.course ? result.exam.course.code : null,
 				},
-				session: result.sessionName,
+				session: result.exam.session ? result.exam.session.name : null,
 				timing: {
 					start: result.startTime,
 					end: result.endTime,
-					startDate: result.examStartDate,
-					endDate: result.examEndDate,
+					startDate: result.exam.startDate,
+					endDate: result.exam.endDate,
 				},
 			},
 			studentDetails: {
-				name: result.studentName,
-				email: result.studentEmail,
-				matricNo: result.studentMatricNo,
+				name: result.student
+					? `${result.student.firstName} ${result.student.lastName}`
+					: null,
+				email: result.student ? result.student.email : null,
+				matricNo: result.student ? result.student.idNumber : null,
 			},
 			totalScore: result.totalScore,
 			questions: formattedQuestions,
@@ -293,35 +337,36 @@ const fetchExamResult = async (studentId: string, examId: string) => {
  *
  */
 const fetchAllExamResults = async (examId: string) => {
+	console.log(`\nFetching all exam results for exam ID: ${examId}\n`);
 	try {
-		const exam = await Exam.findOne({ where: { id: examId } });
-		if (!exam) throw new Error(`Exam with ID ${examId} not found`);
-
+		// Fetch all results for the given exam
 		const results = await Result.findAll({
 			where: { examId },
-			attributes: [
-				"totalScore",
-				"startTime",
-				"endTime",
-				[col("exams.name"), "examName"],
-				[col("exams.type"), "examType"],
-				[col("exams.startDate"), "examStartDate"],
-				[col("exams.endDate"), "examEndDate"],
-				[col("exams.duration"), "examDuration"],
-				[col("exams.instruction"), "examInstruction"],
-				[col("exams.sessions.name"), "sessionName"],
-				[col("exams.courses.name"), "courseName"],
-				[col("exams.courses.code"), "courseCode"],
-				[col("students.name"), "studentName"],
-				[col("students.email"), "studentEmail"],
-				[col("students.idNumber"), "studentMatricNo"],
-			],
+			attributes: ["totalScore", "startTime", "endTime", "studentId"],
 			include: [
 				{
 					model: Exam,
-					as: "exams",
+					as: "exam",
 					required: true,
+					attributes: [
+						"name",
+						"type",
+						"startDate",
+						"endDate",
+						"duration",
+						"instruction",
+					],
 					include: [
+						{
+							model: Session,
+							as: "session",
+							attributes: ["name"],
+						},
+						{
+							model: Course,
+							as: "course",
+							attributes: ["name", "code"],
+						},
 						{
 							model: Question,
 							as: "questions",
@@ -330,45 +375,49 @@ const fetchAllExamResults = async (examId: string) => {
 								{
 									model: Answer,
 									as: "answers",
-									where: { studentId: col("Examresult.studentId") },
+									where: {
+										studentId: col("studentId"),
+									},
 									attributes: ["isCorrect", "score", "studentTrueOrFalse"],
-								},
-								{
-									model: Option,
-									as: "options",
-									attributes: ["id", "text", "isCorrect"],
+									include: [
+										{
+											model: Option,
+											as: "option",
+											attributes: ["text", "isCorrect"],
+										},
+									],
 								},
 							],
 						},
-						{ model: Session, as: "sessions" },
-						{ model: Course, as: "courses" },
 					],
 				},
 				{
 					model: User,
-					as: "students",
-					required: true,
+					as: "student",
+					attributes: ["firstName", "lastName", "email", "idNumber"],
 				},
 			],
-			order: [["totalScore", "DESC"]],
+			raw: false,
 		});
 
-		const formattedResults = results.map((result: ExtendedResult) => {
-			const formattedQuestions = result.exams.questions.map((question: any) => {
-				const formattedOptions = question.answers.map((answer: any) => {
-					const selectedOption = question.options.find(
-						(o: any) => o.id === answer.optionId
-					);
-					return {
-						optionId: selectedOption?.id,
-						text: selectedOption?.text,
-						isCorrect: selectedOption?.isCorrect,
-						selected: answer.studentTrueOrFalse,
-					};
-				});
+		if (!results || results.length === 0) {
+			throw new Error("No exam results found.");
+		}
+
+		// Structure the results similarly to `fetchExamResult`
+		const formattedResults = results.map((result: any) => {
+			const formattedQuestions = result.exam.questions.map((question: any) => {
+				const formattedOptions = question.answers.map((answer: any) => ({
+					optionText: answer.option ? answer.option.text : null,
+					isCorrect: question.type === "MCQ" ? answer.option?.isCorrect : undefined,
+					studentTrueOrFalse:
+						question.type === "Medical" ? answer.studentTrueOrFalse : undefined,
+					correctAnswer:
+						question.type === "Medical" ? answer.option?.isCorrect : undefined,
+					score: question.type === "Medical" ? answer.score : undefined,
+				}));
 
 				return {
-					questionId: question.id,
 					questionText: question.text,
 					type: question.type,
 					score: question.score,
@@ -378,15 +427,28 @@ const fetchAllExamResults = async (examId: string) => {
 
 			return {
 				examDetails: {
-					name: result.examName,
-					type: result.examType,
-					courseCode: result.courseCode,
-					sessionName: result.sessionName,
+					name: result.exam.name,
+					type: result.exam.type,
+					duration: result.exam.duration,
+					instruction: result.exam.instruction,
+					course: {
+						name: result.exam.course ? result.exam.course.name : null,
+						code: result.exam.course ? result.exam.course.code : null,
+					},
+					session: result.exam.session ? result.exam.session.name : null,
+					timing: {
+						start: result.startTime,
+						end: result.endTime,
+						startDate: result.exam.startDate,
+						endDate: result.exam.endDate,
+					},
 				},
-				student: {
-					name: result.studentName,
-					email: result.studentEmail,
-					matricNo: result.studentMatricNo,
+				studentDetails: {
+					name: result.student
+						? `${result.student.firstName} ${result.student.lastName}`
+						: null,
+					email: result.student ? result.student.email : null,
+					matricNo: result.student ? result.student.idNumber : null,
 				},
 				totalScore: result.totalScore,
 				questions: formattedQuestions,

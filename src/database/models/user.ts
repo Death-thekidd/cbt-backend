@@ -66,11 +66,6 @@ class User extends Model<UserAttributes> implements UserAttributes {
 			foreignKey: "studentId",
 			as: "exams",
 		});
-		User.belongsToMany(models.Result, {
-			foreignKey: "studentId",
-			through: "Studentresults",
-			as: "results",
-		});
 	}
 }
 User.init(

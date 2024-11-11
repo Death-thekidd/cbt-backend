@@ -28,7 +28,7 @@ class Department
 		Department.belongsTo(models.Faculty, {
 			foreignKey: "facultyId",
 			targetKey: "id",
-			as: "faculties",
+			as: "faculty",
 		});
 	}
 }

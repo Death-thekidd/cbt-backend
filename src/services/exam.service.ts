@@ -41,36 +41,36 @@ const getExams = async () => {
 				"startDate",
 				"endDate",
 				"duration",
-				[col("courses.code"), "course"],
-				[col("courses.departments.name"), "department"],
-				[col("courses.departments.faculties.name"), "faculty"],
-				[col("courses.levels.name"), "level"],
-				[col("courses.semesters.name"), "semester"],
-				[col("sessions.name"), "session"],
+				[col("course.code"), "course"],
+				[col("course.department.name"), "department"],
+				[col("course.department.faculty.name"), "faculty"],
+				[col("course.level.name"), "level"],
+				[col("course.semester.name"), "semester"],
+				[col("session.name"), "session"],
 			],
 			include: [
 				{
 					model: Course,
 					required: false,
-					as: "courses",
+					as: "course",
 					attributes: [],
 					include: [
 						{
 							model: Level,
 							required: false,
-							as: "levels",
+							as: "level",
 							attributes: [],
 						},
 						{
 							model: Department,
 							required: false,
-							as: "departments",
+							as: "department",
 							attributes: [],
 							include: [
 								{
 									model: Faculty,
 									required: false,
-									as: "faculties",
+									as: "faculty",
 									attributes: [],
 								},
 							],
@@ -78,7 +78,7 @@ const getExams = async () => {
 						{
 							model: Semester,
 							required: false,
-							as: "semesters",
+							as: "semester",
 							attributes: [],
 						},
 					],
@@ -86,7 +86,7 @@ const getExams = async () => {
 				{
 					model: Session,
 					required: false,
-					as: "sessions",
+					as: "session",
 					attributes: [],
 				},
 				{
@@ -123,36 +123,36 @@ const getExamById = async (data: any) => {
 				"endDate",
 				"duration",
 				"examtypeId",
-				[col("courses.code"), "course"],
-				[col("courses.departments.name"), "department"],
-				[col("courses.departments.faculties.name"), "faculty"],
-				[col("courses.levels.name"), "level"],
-				[col("courses.semesters.name"), "semester"],
-				[col("sessions.name"), "session"],
+				[col("course.code"), "course"],
+				[col("course.department.name"), "department"],
+				[col("course.department.faculty.name"), "faculty"],
+				[col("course.level.name"), "level"],
+				[col("course.semester.name"), "semester"],
+				[col("session.name"), "session"],
 			],
 			include: [
 				{
 					model: Course,
 					required: false,
-					as: "courses",
+					as: "course",
 					attributes: ["id"],
 					include: [
 						{
 							model: Level,
 							required: false,
-							as: "levels",
+							as: "level",
 							attributes: ["id"],
 						},
 						{
 							model: Department,
 							required: false,
-							as: "departments",
+							as: "department",
 							attributes: ["id"],
 							include: [
 								{
 									model: Faculty,
 									required: false,
-									as: "faculties",
+									as: "faculty",
 									attributes: ["id"],
 								},
 							],
@@ -160,7 +160,7 @@ const getExamById = async (data: any) => {
 						{
 							model: Semester,
 							required: false,
-							as: "semesters",
+							as: "semester",
 							attributes: ["id"],
 						},
 					],
@@ -168,7 +168,7 @@ const getExamById = async (data: any) => {
 				{
 					model: Session,
 					required: false,
-					as: "sessions",
+					as: "session",
 					attributes: ["id"],
 				},
 				{
@@ -193,7 +193,7 @@ const getExamById = async (data: any) => {
 	}
 };
 
-const getStudentExams = async (studentId: number) => {
+const getStudentExams = async (studentId: any) => {
 	try {
 		// Find the student by ID and use the getExams association method
 		const student = await User.findByPk(studentId);
@@ -207,57 +207,58 @@ const getStudentExams = async (studentId: number) => {
 				"startDate",
 				"endDate",
 				"duration",
-				[col("courses.code"), "course"],
-				[col("courses.departments.name"), "department"],
-				[col("courses.departments.faculties.name"), "faculty"],
-				[col("courses.levels.name"), "level"],
-				[col("courses.semesters.name"), "semester"],
-				[col("sessions.name"), "session"],
+				[col("course.code"), "course"],
+				[col("course.department.name"), "department"],
+				[col("course.department.faculty.name"), "faculty"],
+				[col("course.level.name"), "level"],
+				[col("course.semester.name"), "semester"],
+				[col("session.name"), "session"],
 			],
 			include: [
 				{
 					model: Course,
-					as: "courses",
+					as: "course",
 					attributes: [],
 					include: [
 						{
 							model: Level,
-							as: "levels",
+							as: "level",
 							attributes: [],
 						},
 						{
 							model: Department,
-							as: "departments",
+							as: "department",
 							attributes: [],
 							include: [
 								{
 									model: Faculty,
-									as: "faculties",
+									as: "faculty",
 									attributes: [],
 								},
 							],
 						},
 						{
 							model: Semester,
-							as: "semesters",
+							as: "semester",
 							attributes: [],
 						},
 					],
 				},
 				{
 					model: Session,
-					as: "sessions",
+					as: "session",
 					attributes: [],
 				},
 				{
 					model: Question,
 					as: "questions",
 					attributes: ["id", "name", "type", "text", "topic", "score"],
+					through: { attributes: [] },
 					include: [
 						{
 							model: Option,
 							as: "options",
-							attributes: ["text", "isCorrect"],
+							attributes: ["id", "text", "isCorrect"],
 							through: { attributes: [] },
 						},
 					],

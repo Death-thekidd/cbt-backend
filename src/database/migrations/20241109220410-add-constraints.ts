@@ -134,42 +134,6 @@ const constraints = [
 		name: "questiona_answer",
 		references: { table: "Answers", field: "id" },
 	},
-	{
-		table: "Optionanswers",
-		field: "optionId",
-		name: "optiona_option",
-		references: { table: "Options", field: "id" },
-	},
-	{
-		table: "Optionanswers",
-		field: "answerId",
-		name: "optiona_answer",
-		references: { table: "Answers", field: "id" },
-	},
-	{
-		table: "Examresults",
-		field: "examId",
-		name: "examr_exam",
-		references: { table: "Exams", field: "id" },
-	},
-	{
-		table: "Examresults",
-		field: "resultId",
-		name: "examr_result",
-		references: { table: "Results", field: "id" },
-	},
-	{
-		table: "Studentresults",
-		field: "studentId",
-		name: "studentr_student",
-		references: { table: "Users", field: "id" },
-	},
-	{
-		table: "Studentresults",
-		field: "resultId",
-		name: "studentr_result",
-		references: { table: "Results", field: "id" },
-	},
 ];
 
 module.exports = {

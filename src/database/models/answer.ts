@@ -41,15 +41,15 @@ class Answer extends Model<AnswerAttributes> implements AnswerAttributes {
 			targetKey: "id",
 			as: "users",
 		});
-		Answer.belongsTo(models.Question, {
-			foreignKey: "questionId",
-			targetKey: "id",
+		Answer.belongsToMany(models.Question, {
+			through: "Questionanswers",
+			foreignKey: "answerId",
 			as: "questions",
 		});
-		Answer.belongsToMany(models.Option, {
-			through: "Optionanswers",
-			foreignKey: "answerId",
-			as: "options",
+		Answer.belongsTo(models.Option, {
+			foreignKey: "optionId",
+			targetKey: "id",
+			as: "option",
 		});
 	}
 }
