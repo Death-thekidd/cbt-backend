@@ -11,24 +11,26 @@ const addQuestion = async (req: Request, res: Response): Promise<void> => {
 	const respondAndLog = createResponder(req, res);
 	const activity = "ADD_QUESTION";
 	const { examId } = req.params;
-	const { questionId } = req.body;
+	const { questionIds } = req.body;
 
 	try {
-		const questionExists = await examquestionService.checkQuestionExist(
-			questionId
-		);
-		if (questionExists) {
-			return respondAndLog({
-				activity,
-				status: 403,
-				code: "QUESTION_EXISTS",
-				message: "Question already added",
-			});
+		for (let questionId of questionIds) {
+			const questionExists = await examquestionService.checkQuestionExist(
+				questionId
+			);
+			if (questionExists) {
+				return respondAndLog({
+					activity,
+					status: 403,
+					code: "QUESTION_EXISTS",
+					message: "Question already added",
+				});
+			}
 		}
 
 		const examquestion = await examquestionService.addQuestion({
 			examId,
-			questionId,
+			questionIds,
 		});
 		respondAndLog({
 			activity,

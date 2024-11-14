@@ -13,13 +13,18 @@ import { Identifier, Op, col } from "sequelize";
  * User: Admin
  */
 const addQuestion = async (data: any) => {
-	const { examId, questionId } = data;
+	const { examId, questionIds } = data;
 	try {
 		const exam = await Exam.findByPk(examId);
-		const question = await Question.findByPk(questionId);
-		if (!exam || !question) throw new Error("Exam or Question not found");
+		if (!exam) throw new Error("Exam not found");
 
-		await exam.addQuestion(question);
+		for (let questionId of questionIds) {
+			const question = await Question.findByPk(questionId);
+			if (!question) throw new Error("Question not found");
+
+			await exam.addQuestion(question);
+		}
+
 		const updatedQuestions = await exam.getQuestions({
 			attributes: [
 				"id",
